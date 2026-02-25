@@ -1,0 +1,78 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Montserrat:wght@900&family=Space+Mono:wght@400;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-onyx: #0A0A0A;
+  --color-sidebar: #050505;
+  --color-card: #0D0D0D;
+  --color-card-alt: #111111;
+  --color-primary: #3F6A24;
+  --color-accent-mid: #5A8A3A;
+  --color-accent-light: #A8C69F;
+  --color-text-primary: #FFFFFF;
+  --color-text-secondary: #C0C0C0;
+  --color-text-muted: #555555;
+  --color-border-dark: #1A1A1A;
+
+  --font-heading: "Montserrat", sans-serif;
+  --font-mono: "Space Mono", monospace;
+  --font-sans: "Inter", sans-serif;
+}
+
+body {
+  background-color: var(--color-onyx);
+  background-image: radial-gradient(circle at 50% 0%, #161616 0%, transparent 70%);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+  /* Mobile: prevent double-tap zoom, enable smooth scroll */
+  touch-action: manipulation;
+  overscroll-behavior: none;
+}
+
+/* Smooth momentum scroll on all scrollable containers */
+.scroll-touch {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+}
+
+/* Minimum 44px tap targets for accessibility (Android HIG) */
+.tap-target {
+  min-height: 44px;
+  min-width: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Safe area padding for Android bottom nav bar */
+.pb-safe {
+  padding-bottom: max(70px, env(safe-area-inset-bottom));
+}
+
+/* Horizontal scroll snap for Kanban columns */
+.snap-scroll-x {
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+.snap-child {
+  scroll-snap-align: start;
+}
+
+/* Custom Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--color-border-dark);
+  border-radius: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-muted);
+}
