@@ -113,7 +113,7 @@ export default function KnowledgeVault({ selectedClient }: { selectedClient?: st
                                     onChange={e => setSearchQuery(e.target.value)}
                                 />
                             </div>
-                            <div className="flex border border-border-dark rounded-sm overflow-hidden bg-white/5 flex-shrink-0">
+                            <div className="flex  rounded-sm overflow-hidden bg-white/5 flex-shrink-0">
                                 <button
                                     onClick={() => setViewMode('grid')}
                                     className={`p-2 transition-colors ${viewMode === 'grid' ? 'bg-white/10 text-primary' : 'text-text-muted hover:text-text-primary'}`}

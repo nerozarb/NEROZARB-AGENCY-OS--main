@@ -2,17 +2,17 @@
 @import "tailwindcss";
 
 @theme {
-  --color-onyx: #0A0A0A;
-  --color-sidebar: #050505;
-  --color-card: #0D0D0D;
-  --color-card-alt: #111111;
+  --color-onyx: #09090B;
+  --color-sidebar: #09090B;
+  --color-card: rgba(255, 255, 255, 0.02);
+  --color-card-alt: rgba(255, 255, 255, 0.05);
   --color-primary: #3F6A24;
   --color-accent-mid: #5A8A3A;
   --color-accent-light: #A8C69F;
   --color-text-primary: #FFFFFF;
-  --color-text-secondary: #C0C0C0;
-  --color-text-muted: #555555;
-  --color-border-dark: #1A1A1A;
+  --color-text-secondary: #D4D4D8;
+  --color-text-muted: #A1A1AA;
+  --color-border-dark: rgba(255, 255, 255, 0.05);
 
   --font-heading: "Montserrat", sans-serif;
   --font-mono: "Space Mono", monospace;

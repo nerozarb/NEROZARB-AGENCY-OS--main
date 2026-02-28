@@ -84,7 +84,7 @@ export default function OnboardingOS({ onNavigate }: { onNavigate?: (view: strin
             {/* Main Board */}
             <div className="flex-1 flex flex-col min-h-0 space-y-4">
                 <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3 flex-shrink-0">
-                    <div className="flex bg-card p-1 border border-border-dark rounded-sm overflow-x-auto scroll-touch">
+                    <div className="flex bg-card p-1  rounded-sm overflow-x-auto scroll-touch">
                         {['ALL', 'INCUBATOR', 'GROWTH', 'ENTERPRISE'].map(t => (
                             <button
                                 key={t}
@@ -102,7 +102,7 @@ export default function OnboardingOS({ onNavigate }: { onNavigate?: (view: strin
                             placeholder="SEARCH PROTOCOLS..."
                             value={searchQuery}
                             onChange={e => setSearchQuery(e.target.value)}
-                            className="bg-card border border-border-dark pl-10 pr-4 py-2 font-mono text-[9px] tracking-widest text-text-primary w-full sm:w-64 focus:border-primary focus:outline-none"
+                            className="bg-card  pl-10 pr-4 py-2 font-mono text-[9px] tracking-widest text-text-primary w-full sm:w-64 focus:border-primary focus:outline-none"
                         />
                     </div>
                 </div>
@@ -112,7 +112,7 @@ export default function OnboardingOS({ onNavigate }: { onNavigate?: (view: strin
                         {filteredProtocols.length === 0 ? (
                             /* Empty State */
                             <div className="flex flex-col items-center justify-center h-full py-24 px-8">
-                                <div className="w-16 h-16 rounded-full bg-card-alt border border-border-dark flex items-center justify-center mb-6">
+                                <div className="w-16 h-16 rounded-full bg-card-alt  flex items-center justify-center mb-6">
                                     <Rocket size={28} className="text-text-muted/40" />
                                 </div>
                                 <p className="font-mono text-sm text-text-muted tracking-widest uppercase mb-2">
@@ -127,7 +127,7 @@ export default function OnboardingOS({ onNavigate }: { onNavigate?: (view: strin
                                 {!searchQuery && (
                                     <button
                                         onClick={() => onNavigate?.('client')}
-                                        className="flex items-center gap-2 px-4 py-2 bg-card-alt border border-border-dark text-text-muted hover:text-primary hover:border-primary transition-all font-mono text-[10px] tracking-widest uppercase"
+                                        className="flex items-center gap-2 px-4 py-2 bg-card-alt  text-text-muted hover:text-primary hover:border-primary transition-all font-mono text-[10px] tracking-widest uppercase"
                                     >
                                         <Plus size={14} />
                                         GO TO CLIENT OS

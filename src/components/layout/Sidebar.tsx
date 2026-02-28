@@ -49,10 +49,10 @@ export default function Sidebar({ activeView, setActiveView, authLevel, onLogout
 
         {/* Wordmark */}
         <div className="p-[22px_18px_18px] border-b border-border-dark lg:text-left text-center flex-shrink-0">
-          <p className="hidden lg:block font-mono text-[8px] text-accent-light tracking-[2.5px] uppercase mb-1">[ NERO ] + [ ZARB ]</p>
-          <h1 className="font-heading text-[17px] font-black text-text-primary tracking-[3.5px] uppercase leading-none hidden lg:block">NEROZARB</h1>
-          <h1 className="font-heading text-[17px] font-black text-text-primary tracking-[3.5px] uppercase leading-none lg:hidden block">NZ</h1>
-          <p className="hidden lg:block font-sans text-[9px] text-text-muted mt-2">Agency OS · v2.0</p>
+          <p className="hidden lg:block font-mono text-[10px] text-accent-light mb-1">[ NERO ] + [ ZARB ]</p>
+          <h1 className="font-heading text-[17px] font-black text-text-primary uppercase leading-none hidden lg:block">NEROZARB</h1>
+          <h1 className="font-heading text-[17px] font-black text-text-primary uppercase leading-none lg:hidden block">NZ</h1>
+          <p className="hidden lg:block font-sans text-[11px] font-medium text-text-muted mt-2">Agency OS · v2.0</p>
         </div>
 
         {/* Navigation */}
@@ -73,7 +73,7 @@ export default function Sidebar({ activeView, setActiveView, authLevel, onLogout
                 title={item.label}
               >
                 <Icon size={18} className={isActive ? 'text-primary' : ''} />
-                <span className="hidden lg:block font-heading font-bold text-[9px] tracking-[1.5px] uppercase">
+                <span className="hidden lg:block font-heading font-bold text-[11px] tracking-[0.5px]">
                   {item.label}
                 </span>
                 {badgeCount > 0 && (
@@ -90,8 +90,8 @@ export default function Sidebar({ activeView, setActiveView, authLevel, onLogout
         <div className="mt-auto border-t border-border-dark flex-shrink-0">
           {authLevel === 'ceo' && (
             <div className="px-[18px] py-2 border-b border-border-dark/50 bg-primary/5">
-              <p className="font-mono text-[8px] text-primary tracking-wider uppercase hidden lg:block">[ CEO ACCESS ACTIVE ]</p>
-              <p className="font-mono text-[8px] text-primary tracking-wider uppercase lg:hidden text-center">CEO</p>
+              <p className="font-mono text-[10px] text-primary tracking-wide hidden lg:block">[ CEO ACCESS ACTIVE ]</p>
+              <p className="font-mono text-[10px] text-primary tracking-wide lg:hidden text-center">CEO</p>
             </div>
           )}
           <div className="p-[14px_18px] space-y-2 flex flex-col items-center lg:items-start">
@@ -100,17 +100,17 @@ export default function Sidebar({ activeView, setActiveView, authLevel, onLogout
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-primary shadow-[0_0_4px_rgba(63,106,36,0.8)]"></span>
               </div>
-              <p className="font-mono text-[8px] text-accent-light tracking-wider uppercase hidden lg:block">SYSTEM ONLINE</p>
+              <p className="font-mono text-[10px] text-accent-light tracking-wide hidden lg:block">SYSTEM ONLINE</p>
             </div>
-            <p className="hidden lg:block font-sans text-[9px] text-text-muted">The Digital Atelier</p>
-            <p className="hidden lg:block font-mono text-[8px] text-[#333] tracking-widest uppercase">GROWTH. ENGINEERED.</p>
+            <p className="hidden lg:block font-sans text-[11px] font-medium text-text-muted">The Digital Atelier</p>
+            <p className="hidden lg:block font-mono text-[10px] text-[#555] tracking-wide">Growth. Engineered.</p>
             <button
               onClick={onLogout}
               className="flex items-center gap-2 text-text-muted hover:text-red-500 transition-colors pt-2 group w-full justify-center lg:justify-start"
               title="Terminate Session"
             >
               <LogOut size={14} />
-              <span className="hidden lg:block font-mono text-[8px] tracking-widest uppercase">Terminate Session</span>
+              <span className="hidden lg:block font-mono text-[10px] font-medium">Terminate Session</span>
             </button>
           </div>
         </div>
@@ -135,7 +135,7 @@ export default function Sidebar({ activeView, setActiveView, authLevel, onLogout
                 ${isActive ? 'text-primary' : 'text-text-muted'}`}
             >
               <Icon size={20} />
-              <span className="font-mono text-[8px] tracking-wide uppercase leading-none mt-0.5 truncate w-full text-center">
+              <span className="font-mono text-[10px] font-medium tracking-wide leading-none mt-0.5 truncate w-full text-center">
                 {item.label.split(' ')[0]}
               </span>
               {/* Active underline */}
@@ -158,7 +158,7 @@ export default function Sidebar({ activeView, setActiveView, authLevel, onLogout
           className="flex flex-col items-center justify-center gap-0.5 py-3 px-2 text-text-muted hover:text-red-500 transition-colors"
         >
           <LogOut size={18} />
-          <span className="font-mono text-[8px] tracking-wide uppercase">Exit</span>
+          <span className="font-mono text-[10px] font-medium tracking-wide">Exit</span>
         </button>
       </nav>
     </>

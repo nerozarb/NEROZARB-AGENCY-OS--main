@@ -58,20 +58,20 @@ export default function MonthlyView({ posts, clients, onPostClick, onAddPost }: 
     };
 
     return (
-        <motion.div variants={itemVariants} className="bg-card border border-border-dark rounded-sm flex-1 flex flex-col min-h-0 overflow-hidden">
+        <motion.div variants={itemVariants} className="bg-card  rounded-sm flex-1 flex flex-col min-h-0 overflow-hidden">
             {/* Header row */}
             <div className="flex justify-between items-center p-4 border-b border-border-dark flex-shrink-0">
                 <div className="flex items-center gap-4">
                     <button
                         onClick={prevMonth}
-                        className="p-1.5 text-text-muted hover:text-text-primary transition-colors border border-border-dark rounded-sm hover:border-text-muted/30"
+                        className="p-1.5 text-text-muted hover:text-text-primary transition-colors  rounded-sm hover:border-text-muted/30"
                     >
                         <ChevronLeft size={16} />
                     </button>
                     <h3 className="font-heading text-xl text-text-primary tracking-tight w-56 text-center">{monthLabel}</h3>
                     <button
                         onClick={nextMonth}
-                        className="p-1.5 text-text-muted hover:text-text-primary transition-colors border border-border-dark rounded-sm hover:border-text-muted/30"
+                        className="p-1.5 text-text-muted hover:text-text-primary transition-colors  rounded-sm hover:border-text-muted/30"
                     >
                         <ChevronRight size={16} />
                     </button>
@@ -160,7 +160,7 @@ export default function MonthlyView({ posts, clients, onPostClick, onAddPost }: 
                                                     <div
                                                         key={post.id}
                                                         onClick={(e) => { e.stopPropagation(); onPostClick(post); }}
-                                                        className="text-xs p-1 rounded-sm bg-card-alt border border-border-dark flex items-center gap-1.5 cursor-pointer hover:border-text-muted/40 transition-colors pointer-events-auto truncate"
+                                                        className="text-xs p-1 rounded-sm bg-card-alt  flex items-center gap-1.5 cursor-pointer hover:border-text-muted/40 transition-colors pointer-events-auto truncate"
                                                         title={post.hook || post.postType}
                                                     >
                                                         <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${getStatusColor(post.status)}`} />

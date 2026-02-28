@@ -141,7 +141,7 @@ export default function NewPostModal({ isOpen, onClose, post, prefilledDate }: N
                         initial={{ opacity: 0, scale: 0.95, y: 20 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                        className="relative w-full max-w-4xl max-h-[90vh] bg-card border border-border-dark rounded-sm shadow-2xl overflow-hidden flex flex-col"
+                        className="relative w-full max-w-4xl max-h-[90vh] bg-card  rounded-sm shadow-2xl overflow-hidden flex flex-col"
                     >
                         {/* Header */}
                         <div className="p-6 border-b border-border-dark flex justify-between items-center bg-card-alt shrink-0">
@@ -170,7 +170,7 @@ export default function NewPostModal({ isOpen, onClose, post, prefilledDate }: N
                                         <select
                                             value={clientId}
                                             onChange={(e) => setClientId(e.target.value === '' ? '' : Number(e.target.value))}
-                                            className="w-full bg-background border border-border-dark rounded-sm p-3 text-sm text-text-primary focus:border-primary outline-none"
+                                            className="w-full bg-background  rounded-sm p-3 text-sm text-text-primary focus:border-primary outline-none"
                                             required
                                         >
                                             <option value="">Select a client...</option>
@@ -199,7 +199,7 @@ export default function NewPostModal({ isOpen, onClose, post, prefilledDate }: N
                                         <select
                                             value={postType}
                                             onChange={(e) => setPostType(e.target.value as PostType)}
-                                            className="w-full bg-background border border-border-dark rounded-sm p-3 text-sm text-text-primary focus:border-primary outline-none"
+                                            className="w-full bg-background  rounded-sm p-3 text-sm text-text-primary focus:border-primary outline-none"
                                         >
                                             {POST_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
                                         </select>
@@ -209,7 +209,7 @@ export default function NewPostModal({ isOpen, onClose, post, prefilledDate }: N
                                         <select
                                             value={contentPillar}
                                             onChange={(e) => setContentPillar(e.target.value)}
-                                            className="w-full bg-background border border-border-dark rounded-sm p-3 text-sm text-text-primary focus:border-primary outline-none"
+                                            className="w-full bg-background  rounded-sm p-3 text-sm text-text-primary focus:border-primary outline-none"
                                         >
                                             {clientId === '' && <option value="">Select client first</option>}
                                             {selectedClientPillars.map(pillar => <option key={pillar} value={pillar}>{pillar}</option>)}
@@ -221,7 +221,7 @@ export default function NewPostModal({ isOpen, onClose, post, prefilledDate }: N
                                         <select
                                             value={templateType}
                                             onChange={(e) => setTemplateType(e.target.value as TemplateType)}
-                                            className="w-full bg-background border border-border-dark rounded-sm p-3 text-sm text-text-primary focus:border-primary outline-none"
+                                            className="w-full bg-background  rounded-sm p-3 text-sm text-text-primary focus:border-primary outline-none"
                                         >
                                             {TEMPLATES.map(t => <option key={t} value={t}>{t}</option>)}
                                         </select>
@@ -239,7 +239,7 @@ export default function NewPostModal({ isOpen, onClose, post, prefilledDate }: N
                                         value={hook}
                                         onChange={(e) => setHook(e.target.value)}
                                         placeholder="THE ONE LINE THAT STOPS THE SCROLL..."
-                                        className="w-full bg-background border border-border-dark rounded-sm p-3 text-sm text-text-primary focus:border-primary outline-none resize-none font-bold"
+                                        className="w-full bg-background  rounded-sm p-3 text-sm text-text-primary focus:border-primary outline-none resize-none font-bold"
                                         rows={2}
                                     />
                                     <div className="flex gap-2 pt-1 overflow-x-auto pb-2">
@@ -247,7 +247,7 @@ export default function NewPostModal({ isOpen, onClose, post, prefilledDate }: N
                                             <button
                                                 key={t}
                                                 onClick={() => handlePsychTrigger(t)}
-                                                className="shrink-0 px-2 py-0.5 text-[10px] uppercase tracking-wider font-mono bg-card-alt border border-border-dark text-text-muted rounded-sm hover:text-primary transition-colors"
+                                                className="shrink-0 px-2 py-0.5 text-[10px] uppercase tracking-wider font-mono bg-card-alt  text-text-muted rounded-sm hover:text-primary transition-colors"
                                             >
                                                 [ {t} ]
                                             </button>
@@ -261,7 +261,7 @@ export default function NewPostModal({ isOpen, onClose, post, prefilledDate }: N
                                         value={captionBody}
                                         onChange={(e) => setCaptionBody(e.target.value)}
                                         placeholder="2–4 sentences. What they realize. What they learn. First person but brand-first."
-                                        className="w-full bg-background border border-border-dark rounded-sm p-3 text-sm text-text-primary focus:border-primary outline-none resize-none"
+                                        className="w-full bg-background  rounded-sm p-3 text-sm text-text-primary focus:border-primary outline-none resize-none"
                                         rows={4}
                                     />
                                 </div>
@@ -272,7 +272,7 @@ export default function NewPostModal({ isOpen, onClose, post, prefilledDate }: N
                                         <select
                                             value={ctaType}
                                             onChange={(e) => setCtaType(e.target.value as CTAType)}
-                                            className="w-full bg-background border border-border-dark rounded-sm p-3 text-sm text-text-primary focus:border-primary outline-none"
+                                            className="w-full bg-background  rounded-sm p-3 text-sm text-text-primary focus:border-primary outline-none"
                                         >
                                             {CTA_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
                                         </select>
@@ -281,7 +281,7 @@ export default function NewPostModal({ isOpen, onClose, post, prefilledDate }: N
                                                 value={customCta}
                                                 onChange={e => setCustomCta(e.target.value)}
                                                 placeholder="Enter custom CTA phrasing..."
-                                                className="w-full bg-background border border-border-dark rounded-sm p-3 mt-2 text-sm text-text-primary focus:border-primary outline-none"
+                                                className="w-full bg-background  rounded-sm p-3 mt-2 text-sm text-text-primary focus:border-primary outline-none"
                                             />
                                         )}
                                     </div>
@@ -291,7 +291,7 @@ export default function NewPostModal({ isOpen, onClose, post, prefilledDate }: N
                                             value={hashtags}
                                             onChange={(e) => setHashtags(e.target.value)}
                                             placeholder="#nerozarb #digitalgrowth ... (8–12 max)"
-                                            className="w-full bg-background border border-border-dark rounded-sm p-3 text-sm text-text-primary focus:border-primary outline-none resize-none"
+                                            className="w-full bg-background  rounded-sm p-3 text-sm text-text-primary focus:border-primary outline-none resize-none"
                                             rows={2}
                                         />
                                     </div>
@@ -323,7 +323,7 @@ export default function NewPostModal({ isOpen, onClose, post, prefilledDate }: N
                                                 type="date"
                                                 value={scheduledDate}
                                                 onChange={(e) => setScheduledDate(e.target.value)}
-                                                className="w-full bg-background border border-border-dark rounded-sm p-3 text-sm text-text-primary focus:border-primary outline-none"
+                                                className="w-full bg-background  rounded-sm p-3 text-sm text-text-primary focus:border-primary outline-none"
                                                 required
                                             />
                                         </div>
@@ -333,7 +333,7 @@ export default function NewPostModal({ isOpen, onClose, post, prefilledDate }: N
                                                 type="time"
                                                 value={scheduledTime}
                                                 onChange={(e) => setScheduledTime(e.target.value)}
-                                                className="w-full bg-background border border-border-dark rounded-sm p-3 text-sm text-text-primary focus:border-primary outline-none"
+                                                className="w-full bg-background  rounded-sm p-3 text-sm text-text-primary focus:border-primary outline-none"
                                             />
                                         </div>
                                     </div>
@@ -343,7 +343,7 @@ export default function NewPostModal({ isOpen, onClose, post, prefilledDate }: N
                                             <select
                                                 value={priority}
                                                 onChange={(e) => setPriority(e.target.value as any)}
-                                                className="w-full bg-background border border-border-dark rounded-sm p-3 text-sm text-text-primary focus:border-primary outline-none"
+                                                className="w-full bg-background  rounded-sm p-3 text-sm text-text-primary focus:border-primary outline-none"
                                             >
                                                 <option value="normal">Normal</option>
                                                 <option value="high">High Priority</option>
@@ -355,7 +355,7 @@ export default function NewPostModal({ isOpen, onClose, post, prefilledDate }: N
                                             <select
                                                 value={status}
                                                 onChange={(e) => setStatus(e.target.value as PostStage)}
-                                                className="w-full bg-background border border-border-dark rounded-sm p-3 text-sm text-text-primary focus:border-primary outline-none"
+                                                className="w-full bg-background  rounded-sm p-3 text-sm text-text-primary focus:border-primary outline-none"
                                             >
                                                 <option value="PLANNED">PLANNED</option>
                                                 <option value="BRIEF WRITTEN">BRIEF WRITTEN</option>
@@ -373,7 +373,7 @@ export default function NewPostModal({ isOpen, onClose, post, prefilledDate }: N
                                             <select
                                                 value={assignedTo}
                                                 onChange={(e) => setAssignedTo(e.target.value as NodeRole)}
-                                                className="w-full bg-background border border-border-dark rounded-sm p-3 text-sm text-text-primary focus:border-primary outline-none"
+                                                className="w-full bg-background  rounded-sm p-3 text-sm text-text-primary focus:border-primary outline-none"
                                             >
                                                 <option value="Art Director">Art Director</option>
                                                 <option value="Video Editor">Video Editor</option>
@@ -385,7 +385,7 @@ export default function NewPostModal({ isOpen, onClose, post, prefilledDate }: N
                                             <select
                                                 value={linkedTaskId}
                                                 onChange={(e) => setLinkedTaskId(e.target.value === '' ? '' : Number(e.target.value))}
-                                                className="w-full bg-background border border-border-dark rounded-sm p-3 text-sm text-text-primary focus:border-primary outline-none"
+                                                className="w-full bg-background  rounded-sm p-3 text-sm text-text-primary focus:border-primary outline-none"
                                             >
                                                 <option value="">None</option>
                                                 {data.tasks.filter(t => t.status === 'active').map(t => (
@@ -400,7 +400,7 @@ export default function NewPostModal({ isOpen, onClose, post, prefilledDate }: N
                                             value={assetLinks}
                                             onChange={(e) => setAssetLinks(e.target.value)}
                                             placeholder="Link to Canva file, Drive folder..."
-                                            className="w-full bg-background border border-border-dark rounded-sm p-3 text-sm text-text-primary focus:border-primary outline-none"
+                                            className="w-full bg-background  rounded-sm p-3 text-sm text-text-primary focus:border-primary outline-none"
                                         />
                                     </div>
                                 </section>

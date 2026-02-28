@@ -117,7 +117,7 @@ export function ProtocolEditorModal({ isOpen, onClose, editProtocol }: ProtocolE
                     initial={{ opacity: 0, scale: 0.95, y: 20 }}
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                    className="bg-bg-main border border-border-dark rounded-sm w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden shadow-2xl"
+                    className="bg-bg-main  rounded-sm w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden shadow-2xl"
                 >
                     {/* Header */}
                     <div className="flex justify-between items-center p-6 border-b border-border-dark bg-card">
@@ -157,7 +157,7 @@ export function ProtocolEditorModal({ isOpen, onClose, editProtocol }: ProtocolE
                                 <div className="space-y-1.5">
                                     <label className="font-mono text-[10px] uppercase text-text-secondary tracking-widest pl-1">Category</label>
                                     <select
-                                        className="w-full bg-card border border-border-dark rounded-sm px-3 py-2 text-sm font-mono text-text-primary focus:outline-none focus:border-primary transition-colors appearance-none"
+                                        className="w-full bg-card  rounded-sm px-3 py-2 text-sm font-mono text-text-primary focus:outline-none focus:border-primary transition-colors appearance-none"
                                         value={formData.category}
                                         onChange={e => setFormData({ ...formData, category: e.target.value as ProtocolCategory })}
                                     >
@@ -167,7 +167,7 @@ export function ProtocolEditorModal({ isOpen, onClose, editProtocol }: ProtocolE
                                 <div className="space-y-1.5">
                                     <label className="font-mono text-[10px] uppercase text-text-secondary tracking-widest pl-1">Pillar</label>
                                     <select
-                                        className="w-full bg-card border border-border-dark rounded-sm px-3 py-2 text-sm font-mono text-text-primary focus:outline-none focus:border-primary transition-colors appearance-none"
+                                        className="w-full bg-card  rounded-sm px-3 py-2 text-sm font-mono text-text-primary focus:outline-none focus:border-primary transition-colors appearance-none"
                                         value={formData.pillar}
                                         onChange={e => setFormData({ ...formData, pillar: e.target.value as PillarType })}
                                     >
@@ -177,7 +177,7 @@ export function ProtocolEditorModal({ isOpen, onClose, editProtocol }: ProtocolE
                                 <div className="space-y-1.5">
                                     <label className="font-mono text-[10px] uppercase text-text-secondary tracking-widest pl-1">Status</label>
                                     <select
-                                        className="w-full bg-card border border-border-dark rounded-sm px-3 py-2 text-sm font-mono text-text-primary focus:outline-none focus:border-primary transition-colors appearance-none"
+                                        className="w-full bg-card  rounded-sm px-3 py-2 text-sm font-mono text-text-primary focus:outline-none focus:border-primary transition-colors appearance-none"
                                         value={formData.status}
                                         onChange={e => setFormData({ ...formData, status: e.target.value as ProtocolStatus })}
                                     >
@@ -190,7 +190,7 @@ export function ProtocolEditorModal({ isOpen, onClose, editProtocol }: ProtocolE
                                             <Bot className="w-3 h-3" /> Target Tool
                                         </label>
                                         <select
-                                            className="w-full bg-card border border-border-dark rounded-sm px-3 py-2 text-sm font-mono text-text-primary focus:outline-none focus:border-primary transition-colors appearance-none"
+                                            className="w-full bg-card  rounded-sm px-3 py-2 text-sm font-mono text-text-primary focus:outline-none focus:border-primary transition-colors appearance-none"
                                             value={formData.promptTool || 'both'}
                                             onChange={e => setFormData({ ...formData, promptTool: e.target.value as any })}
                                         >
@@ -209,7 +209,7 @@ export function ProtocolEditorModal({ isOpen, onClose, editProtocol }: ProtocolE
                                 <span className="bg-primary/20 p-1 rounded-sm"><Type className="w-3 h-3" /></span>
                                 Content Definition
                             </h3>
-                            <div className="flex-1 border border-border-dark rounded-sm overflow-hidden flex flex-col bg-card relative">
+                            <div className="flex-1  rounded-sm overflow-hidden flex flex-col bg-card relative">
                                 {/* Simple Toolbar Mock */}
                                 <div className="h-10 bg-black/20 border-b border-border-dark flex items-center px-2 gap-1 overflow-x-auto">
                                     <Button variant="ghost" className="h-6 px-2 text-[10px] font-mono hover:bg-white/10 opacity-70">H1</Button>

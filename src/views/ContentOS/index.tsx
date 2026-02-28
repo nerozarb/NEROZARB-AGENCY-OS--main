@@ -71,7 +71,7 @@ export default function ContentOS({ onNavigate }: { onNavigate?: (view: string, 
 
         <div className="flex items-center gap-2 md:gap-6 overflow-x-auto pb-1 scroll-touch">
           {/* Client Selector */}
-          <div className="flex bg-card border border-border-dark rounded-sm p-1 text-sm">
+          <div className="flex bg-card  rounded-sm p-1 text-sm">
             <select
               value={clientFilter}
               onChange={(e) => setClientFilter(e.target.value === 'all' ? 'all' : Number(e.target.value))}
@@ -93,7 +93,7 @@ export default function ContentOS({ onNavigate }: { onNavigate?: (view: string, 
           )}
 
           {/* View Toggles */}
-          <div className="flex bg-card border border-border-dark rounded-sm p-1">
+          <div className="flex bg-card  rounded-sm p-1">
             <button
               onClick={() => setViewMode('monthly')}
               className={`p-2 rounded-sm transition-colors ${viewMode === 'monthly' ? 'bg-card-alt text-primary' : 'text-text-muted hover:text-text-primary'}`}

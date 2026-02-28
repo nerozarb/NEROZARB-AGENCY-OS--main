@@ -74,13 +74,13 @@ export default function NewTaskModal({ isOpen, onClose }: NewTaskModalProps) {
           />
 
           <div className="space-y-2">
-            <label className="block font-mono text-[10px] tracking-widest text-text-muted uppercase">
+            <label className="block font-mono text-xs font-medium text-text-muted">
               Client
             </label>
             <select
               value={clientId}
               onChange={e => setClientId(Number(e.target.value))}
-              className="w-full bg-card-alt border border-border-dark text-text-primary px-4 py-3 text-sm focus:outline-none focus:border-primary transition-colors hover:border-text-muted"
+              className="w-full bg-card-alt  text-text-primary px-4 py-3 text-sm focus:outline-none focus:border-primary transition-colors hover:border-text-muted"
             >
               <option value="" disabled>Select Client</option>
               {data.clients.map(c => (
@@ -91,13 +91,13 @@ export default function NewTaskModal({ isOpen, onClose }: NewTaskModalProps) {
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label className="block font-mono text-[10px] tracking-widest text-text-muted uppercase">
+              <label className="block font-mono text-xs font-medium text-text-muted">
                 Category
               </label>
               <select
                 value={category}
                 onChange={e => setCategory(e.target.value as TaskCategory)}
-                className="w-full bg-card-alt border border-border-dark text-text-primary px-4 py-3 text-sm focus:outline-none focus:border-primary"
+                className="w-full bg-card-alt  text-text-primary px-4 py-3 text-sm focus:outline-none focus:border-primary"
               >
                 {['Content Production', 'Ad Creative', 'Website', 'Strategy', 'Video Production', 'Brand Design', 'Analytics', 'Automation', 'Client Communication', 'Other'].map(c => (
                   <option key={c} value={c}>{c}</option>
@@ -106,13 +106,13 @@ export default function NewTaskModal({ isOpen, onClose }: NewTaskModalProps) {
             </div>
 
             <div className="space-y-2">
-              <label className="block font-mono text-[10px] tracking-widest text-text-muted uppercase">
+              <label className="block font-mono text-xs font-medium text-text-muted">
                 Assignee Node
               </label>
               <select
                 value={assignedNode}
                 onChange={e => setAssignedNode(e.target.value as NodeRole)}
-                className="w-full bg-card-alt border border-border-dark text-text-primary px-4 py-3 text-sm focus:outline-none focus:border-primary"
+                className="w-full bg-card-alt  text-text-primary px-4 py-3 text-sm focus:outline-none focus:border-primary"
               >
                 {['CEO', 'Art Director', 'Video Editor', 'Operations Builder', 'Social Media Manager', 'Documentation Manager'].map(n => (
                   <option key={n} value={n}>{n}</option>
@@ -122,7 +122,7 @@ export default function NewTaskModal({ isOpen, onClose }: NewTaskModalProps) {
           </div>
 
           <div className="space-y-2">
-            <label className="block font-mono text-[10px] tracking-widest text-text-muted uppercase">
+            <label className="block font-mono text-xs font-medium text-text-muted">
               Priority Level
             </label>
             <div className="grid grid-cols-3 gap-3">
@@ -177,13 +177,13 @@ export default function NewTaskModal({ isOpen, onClose }: NewTaskModalProps) {
           </div>
 
           <div className="space-y-2">
-            <label className="block font-mono text-[10px] tracking-widest text-text-muted uppercase">
+            <label className="block font-mono text-xs font-medium text-text-muted">
               Task Brief
             </label>
             <textarea
               value={brief}
               onChange={e => setBrief(e.target.value)}
-              className="w-full bg-card-alt border border-border-dark text-text-primary px-4 py-3 text-sm focus:outline-none focus:border-primary transition-colors hover:border-text-muted rounded-none"
+              className="w-full bg-card-alt  text-text-primary px-4 py-3 text-sm focus:outline-none focus:border-primary transition-colors hover:border-text-muted rounded-none"
               rows={3}
               placeholder="Describe the objective and deliverables..."
             />

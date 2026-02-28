@@ -41,13 +41,13 @@ export default function AppShell({
         <header className="hidden md:flex h-[60px] border-b border-border-dark bg-card items-center justify-between px-8 flex-shrink-0 z-40 relative">
           <div className="flex items-center gap-2 text-text-muted">
             <Hexagon size={16} />
-            <span className="font-mono text-xs tracking-widest uppercase">System Operations</span>
+            <span className="font-mono text-[13px] font-medium tracking-wide">System Operations</span>
           </div>
 
           <div className="flex items-center gap-4">
-            <span className="font-mono text-[10px] text-text-muted uppercase tracking-widest">Active Context:</span>
+            <span className="font-mono text-xs font-medium text-text-muted">Active Context:</span>
             <div className="relative group">
-              <button className="flex items-center gap-2 px-3 py-1.5 bg-card-alt border border-border-dark rounded-sm hover:border-primary transition-colors min-w-[160px] justify-between">
+              <button className="flex items-center gap-2 px-3 py-1.5 bg-card-alt  rounded-sm hover:border-primary transition-colors min-w-[160px] justify-between">
                 <span className="text-sm font-medium text-text-primary">
                   {selectedClient || 'Global View'}
                 </span>

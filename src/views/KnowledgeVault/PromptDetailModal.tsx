@@ -46,7 +46,7 @@ export function PromptDetailModal({ isOpen, onClose, protocol, onEdit }: PromptD
                     initial={{ opacity: 0, scale: 0.95, y: 20 }}
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                    className="bg-[#0A0A0A] border border-border-dark rounded-sm w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.5)]"
+                    className="bg-[#0A0A0A]  rounded-sm w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.5)]"
                 >
                     {/* Sticky Header */}
                     <div className="flex justify-between items-center p-6 border-b border-border-dark bg-[#0A0A0A] sticky top-0 z-10">
@@ -63,7 +63,7 @@ export function PromptDetailModal({ isOpen, onClose, protocol, onEdit }: PromptD
                                         {protocol.pillar}
                                     </span>
                                     {protocol.promptTool && (
-                                        <span className="font-mono text-[10px] text-text-secondary tracking-widest uppercase border border-border-dark px-1.5 py-0.5 rounded-sm">
+                                        <span className="font-mono text-[10px] text-text-secondary tracking-widest uppercase  px-1.5 py-0.5 rounded-sm">
                                             {protocol.promptTool === 'both' ? 'AGNOSTIC' : protocol.promptTool.toUpperCase()}
                                         </span>
                                     )}
@@ -98,7 +98,7 @@ export function PromptDetailModal({ isOpen, onClose, protocol, onEdit }: PromptD
                         <div className="flex-1 p-6 overflow-y-auto custom-scrollbar border-r border-border-dark bg-black/40">
                             <div className="space-y-4">
                                 <h3 className="font-mono text-[10px] uppercase tracking-widest text-text-secondary">Raw Prompt Request</h3>
-                                <pre className="font-mono text-sm text-text-primary whitespace-pre-wrap leading-relaxed bg-[#111] p-4 rounded-sm border border-border-dark select-all">
+                                <pre className="font-mono text-sm text-text-primary whitespace-pre-wrap leading-relaxed bg-[#111] p-4 rounded-sm  select-all">
                                     <code>{protocol.content}</code>
                                 </pre>
                             </div>
@@ -119,7 +119,7 @@ export function PromptDetailModal({ isOpen, onClose, protocol, onEdit }: PromptD
                                                 The following dynamic variables were detected in this prompt. Replace them before executing.
                                             </p>
                                             {variables.map((v, i) => (
-                                                <div key={i} className="bg-bg-main border border-border-dark p-3 rounded-sm">
+                                                <div key={i} className="bg-bg-main  p-3 rounded-sm">
                                                     <span className="font-mono text-xs text-primary font-bold">[[{v}]]</span>
                                                 </div>
                                             ))}

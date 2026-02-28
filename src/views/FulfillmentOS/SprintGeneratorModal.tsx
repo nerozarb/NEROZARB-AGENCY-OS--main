@@ -30,13 +30,13 @@ export default function SprintGeneratorModal({ isOpen, onClose }: SprintGenerato
                 </div>
 
                 <div className="space-y-2">
-                    <label className="block font-mono text-[10px] tracking-widest text-text-muted uppercase">
+                    <label className="block font-mono text-xs font-medium text-text-muted">
                         Target Client
                     </label>
                     <select
                         value={selectedClientId}
                         onChange={(e) => setSelectedClientId(Number(e.target.value))}
-                        className="w-full bg-card-alt border border-border-dark text-text-primary px-4 py-3 text-sm focus:outline-none focus:border-primary transition-colors hover:border-text-muted"
+                        className="w-full bg-card-alt  text-text-primary px-4 py-3 text-sm focus:outline-none focus:border-primary transition-colors hover:border-text-muted"
                     >
                         <option value="" disabled>Select Client</option>
                         {data.clients.map((client) => (
@@ -45,8 +45,8 @@ export default function SprintGeneratorModal({ isOpen, onClose }: SprintGenerato
                     </select>
                 </div>
 
-                <div className="bg-card-alt/50 border border-border-dark p-4 rounded-sm">
-                    <h4 className="font-mono text-[10px] tracking-widest text-text-muted uppercase mb-3">
+                <div className="bg-card-alt/50  p-4 rounded-sm">
+                    <h4 className="font-mono text-xs font-medium text-text-muted mb-3">
                         Injected Tasks
                     </h4>
                     <ul className="space-y-2 font-mono text-xs text-text-secondary">

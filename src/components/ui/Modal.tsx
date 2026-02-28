@@ -44,7 +44,7 @@ export function Modal({ isOpen, onClose, title, width = 500, children }: ModalPr
               <button onClick={onClose} className="text-text-muted hover:text-text-primary transition-colors tap-target">
                 <ArrowLeft size={20} />
               </button>
-              <h2 className="font-heading text-lg tracking-tighter text-text-primary uppercase flex-1">{title}</h2>
+              <h2 className="font-heading text-lg tracking-tighter text-text-primary capitalize flex-1">{title}</h2>
             </div>
             <div className="p-5 overflow-y-auto custom-scrollbar scroll-touch flex-1">
               {children}
@@ -58,13 +58,13 @@ export function Modal({ isOpen, onClose, title, width = 500, children }: ModalPr
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ type: 'spring', stiffness: 300, damping: 25 }}
             className="hidden md:flex fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2
-                       bg-card/95 backdrop-blur-xl border border-border-dark
+                       bg-card/95 backdrop-blur-xl 
                        shadow-[0_0_50px_rgba(0,0,0,0.5)] z-50 overflow-hidden flex-col max-h-[90vh] rounded-sm"
             style={{ width: `${width}px`, maxWidth: '95vw' }}
           >
             <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-primary/50 via-primary to-primary/50" />
             <div className="flex items-center justify-between p-6 border-b border-border-dark">
-              <h2 className="font-heading text-xl tracking-tighter text-text-primary uppercase">{title}</h2>
+              <h2 className="font-heading text-xl tracking-tighter text-text-primary capitalize">{title}</h2>
               <button onClick={onClose} className="text-text-muted hover:text-text-primary transition-colors hover:rotate-90 duration-300">
                 <X size={20} />
               </button>

@@ -221,7 +221,7 @@ export default function OnboardingDetailView({ protocol, onBack, onNavigate }: O
                                         ? 'bg-primary/20 text-primary'
                                         : isNextStep
                                             ? 'bg-primary/10 text-primary border border-primary/30'
-                                            : 'bg-card-alt text-text-muted border border-border-dark'
+                                            : 'bg-card-alt text-text-muted '
                                     }`}>
                                     {String(index + 1).padStart(2, '0')}
                                 </div>
@@ -245,7 +245,7 @@ export default function OnboardingDetailView({ protocol, onBack, onNavigate }: O
                                 {/* Owner Badge */}
                                 <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-sm text-[9px] font-mono uppercase tracking-widest ${step.owner === 'CEO'
                                         ? 'bg-yellow-500/10 text-yellow-500 border border-yellow-500/20'
-                                        : 'bg-card-alt text-text-muted border border-border-dark'
+                                        : 'bg-card-alt text-text-muted '
                                     }`}>
                                     {step.owner === 'CEO' ? <Shield size={10} /> : <Users size={10} />}
                                     {step.owner}
@@ -272,7 +272,7 @@ export default function OnboardingDetailView({ protocol, onBack, onNavigate }: O
                                             <div className="pt-4 space-y-4">
                                                 {/* Instructions */}
                                                 {step.details && (
-                                                    <div className="bg-surface p-4 border border-border-dark/50 rounded-sm">
+                                                    <div className="bg-surface p-4 /50 rounded-sm">
                                                         <p className="font-mono text-[9px] text-primary tracking-widest uppercase mb-2">Instructions</p>
                                                         <p className="text-sm text-text-secondary leading-relaxed">
                                                             {step.details}

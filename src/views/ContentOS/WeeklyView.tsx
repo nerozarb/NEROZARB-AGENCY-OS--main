@@ -78,7 +78,7 @@ export default function WeeklyView({ posts, clients, onPostClick }: WeeklyViewPr
                                     <div
                                         key={post.id}
                                         onClick={() => onPostClick(post)}
-                                        className="bg-card border border-border-dark p-3 rounded-sm cursor-pointer hover:border-primary/40 transition-colors flex flex-col gap-2"
+                                        className="bg-card  p-3 rounded-sm cursor-pointer hover:border-primary/40 transition-colors flex flex-col gap-2"
                                     >
                                         {/* Top row */}
                                         <div className="flex justify-between items-start gap-1">

@@ -36,7 +36,7 @@ export function Badge({ status = 'default', variant, className = '', children }:
   const colorClass = statusColors[normStatus] || 'bg-card-alt border-border-dark text-text-secondary';
 
   return (
-    <span className={`font-mono text-[9px] uppercase tracking-widest px-2 py-0.5 border ${colorClass} ${className}`}>
+    <span className={`font-mono text-[11px] font-medium px-2 py-0.5 border ${colorClass} ${className}`}>
       {children || status}
     </span>
   );

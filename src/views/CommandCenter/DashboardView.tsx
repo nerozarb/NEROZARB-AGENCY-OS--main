@@ -179,7 +179,7 @@ function KpiCard({ title, value, icon: Icon, trend, alert = false, onClick }: an
   return (
     <Card accentTop className={`p-4 md:p-5 group ${onClick ? 'cursor-pointer hover:bg-card-alt transition-colors active:scale-[0.98]' : 'cursor-default'}`} onClick={onClick}>
       <div className="flex justify-between items-start mb-4">
-        <p className="font-mono text-[10px] tracking-widest text-text-muted uppercase">{title}</p>
+        <p className="font-mono text-xs font-medium text-text-muted">{title}</p>
         <Icon size={14} className={`transition-transform duration-300 group-hover:scale-110 ${alert ? 'text-red-500' : 'text-primary'}`} />
       </div>
       <p className="font-heading text-2xl md:text-3xl text-text-primary mb-2">{value}</p>

@@ -1,5 +1,6 @@
 import React, { createContext, useContext, ReactNode } from 'react';
 import { AppData, Client, generateOnboardingProtocol, Task, Stage, ActivityEntry, Post, PostStage, Protocol, TimelineEvent } from '../utils/storage';
+import * as sync from '../utils/supabaseSync';
 
 interface AppDataContextType {
     data: AppData;
@@ -54,7 +55,9 @@ export function AppDataProvider({
         setData(prev => {
             const nextOnboardings = [...prev.onboardings];
             if (newClient.status === 'Active Sprint') {
-                nextOnboardings.push(generateOnboardingProtocol(newId));
+                const newObs = generateOnboardingProtocol(newId);
+                nextOnboardings.push(newObs);
+                sync.syncOnboardingToSupabase(newObs, true);
             }
             return {
                 ...prev,
@@ -62,6 +65,7 @@ export function AppDataProvider({
                 onboardings: nextOnboardings
             };
         });
+        sync.syncClientToSupabase(newClient, true);
         return newId;
     };
 
@@ -105,6 +109,7 @@ export function AppDataProvider({
             }
 
             nextClients[clientIndex] = newClient;
+            sync.syncClientToSupabase(newClient);
 
             return {
                 ...prev,
@@ -124,6 +129,7 @@ export function AppDataProvider({
             onboardings: prev.onboardings.filter(o => o.clientId !== id),
             protocols: prev.protocols.filter(p => !(p.category === 'client-knowledge-base' && p.linkedClientId === id))
         }));
+        sync.deleteClientFromSupabase(id);
     };
 
     const addTimelineEvent = (clientId: number, event: string, type: 'system' | 'manual' = 'system') => {
@@ -137,7 +143,9 @@ export function AppDataProvider({
                     event,
                     type
                 };
-                return { ...c, timeline: [newEvent, ...c.timeline], updatedAt: new Date().toISOString() };
+                const updatedClient = { ...c, timeline: [newEvent, ...c.timeline], updatedAt: new Date().toISOString() };
+                sync.syncClientToSupabase(updatedClient);
+                return updatedClient;
             })
         }));
     };
@@ -187,7 +195,9 @@ export function AppDataProvider({
                     }
                 }
 
-                return { ...obs, steps, progress, status, lastUpdated: new Date().toISOString() };
+                const updatedObs = { ...obs, steps, progress, status, lastUpdated: new Date().toISOString() };
+                sync.syncOnboardingToSupabase(updatedObs);
+                return updatedObs;
             });
             return { ...prev, onboardings: nextOnboardings, clients: nextClients };
         });
@@ -227,18 +237,20 @@ export function AppDataProvider({
             ...prev,
             tasks: [...prev.tasks, newTask]
         }));
+        sync.syncTaskToSupabase(newTask, true);
         return newId;
     };
 
     const updateTask = (id: number, updates: Partial<Task>) => {
-        setData(prev => ({
-            ...prev,
-            tasks: prev.tasks.map(t =>
-                t.id === id
-                    ? { ...t, ...updates, updatedAt: new Date().toISOString() }
-                    : t
-            )
-        }));
+        setData(prev => {
+            const nextTasks = prev.tasks.map(t => {
+                if (t.id !== id) return t;
+                const updatedTask = { ...t, ...updates, updatedAt: new Date().toISOString() };
+                sync.syncTaskToSupabase(updatedTask);
+                return updatedTask;
+            });
+            return { ...prev, tasks: nextTasks };
+        });
     };
 
     const advanceTaskStage = (taskId: number, newStage: Stage, author: 'ceo' | 'team', note?: string) => {
@@ -273,13 +285,15 @@ export function AppDataProvider({
                     }
                 }
 
-                return {
+                const updatedTask = {
                     ...t,
                     currentStage: newStage,
                     activityLog: [...t.activityLog, logEntry],
                     updatedAt: now,
-                    status: newStage === 'DEPLOYED' ? 'deployed' : t.status
+                    status: newStage === 'DEPLOYED' ? 'deployed' as const : t.status
                 };
+                sync.syncTaskToSupabase(updatedTask);
+                return updatedTask;
             });
 
             return {
@@ -331,6 +345,7 @@ export function AppDataProvider({
                     updatedAt: nowIso
                 };
             });
+            sync.syncTasksToSupabase(newTasks);
             return {
                 ...prev,
                 tasks: [...prev.tasks, ...newTasks]
@@ -359,6 +374,7 @@ export function AppDataProvider({
             ...prev,
             posts: [...prev.posts, newPost]
         }));
+        sync.syncPostToSupabase(newPost, true);
         return newId;
     };
 
@@ -412,6 +428,7 @@ export function AppDataProvider({
                         }
                     }
                 }
+                sync.syncPostToSupabase(updatedPost);
                 return updatedPost;
             });
 
@@ -456,13 +473,15 @@ export function AppDataProvider({
                     }
                 }
 
-                return {
+                const updatedPost = {
                     ...p,
                     status: newStage,
                     activityLog: [...p.activityLog, logEntry],
                     updatedAt: now,
                     publishedDate: newStage === 'PUBLISHED' ? now.split('T')[0] : p.publishedDate
                 };
+                sync.syncPostToSupabase(updatedPost);
+                return updatedPost;
             });
 
             return {
@@ -520,6 +539,7 @@ export function AppDataProvider({
                 });
             });
 
+            sync.syncPostsToSupabase(newPosts);
             return {
                 ...prev,
                 posts: [...prev.posts, ...newPosts]
@@ -541,18 +561,20 @@ export function AppDataProvider({
             ...prev,
             protocols: [...prev.protocols, newProtocol]
         }));
+        sync.syncProtocolToSupabase(newProtocol, true);
         return newId;
     };
 
     const updateProtocol = (id: number, updates: Partial<Protocol>) => {
-        setData(prev => ({
-            ...prev,
-            protocols: prev.protocols.map(p =>
-                p.id === id
-                    ? { ...p, ...updates, updatedAt: new Date().toISOString() }
-                    : p
-            )
-        }));
+        setData(prev => {
+            const nextProtocols = prev.protocols.map(p => {
+                if (p.id !== id) return p;
+                const updatedProtocol = { ...p, ...updates, updatedAt: new Date().toISOString() };
+                sync.syncProtocolToSupabase(updatedProtocol);
+                return updatedProtocol;
+            });
+            return { ...prev, protocols: nextProtocols };
+        });
     };
 
     const deleteProtocol = (id: number) => {
@@ -560,17 +582,19 @@ export function AppDataProvider({
             ...prev,
             protocols: prev.protocols.filter(p => p.id !== id)
         }));
+        sync.deleteProtocolFromSupabase(id);
     };
 
     const recordPromptUsage = (id: number) => {
-        setData(prev => ({
-            ...prev,
-            protocols: prev.protocols.map(p =>
-                p.id === id
-                    ? { ...p, copyCount: p.copyCount + 1 }
-                    : p
-            )
-        }));
+        setData(prev => {
+            const nextProtocols = prev.protocols.map(p => {
+                if (p.id !== id) return p;
+                const updatedProtocol = { ...p, copyCount: p.copyCount + 1 };
+                sync.syncProtocolToSupabase(updatedProtocol);
+                return updatedProtocol;
+            });
+            return { ...prev, protocols: nextProtocols };
+        });
     };
 
     return (

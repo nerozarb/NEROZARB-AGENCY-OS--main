@@ -30,7 +30,7 @@ export default function PostPipelineView({ posts, clients, onPostClick }: PostPi
     if (posts.length === 0) {
         return (
             <div className="flex-1 flex flex-col items-center justify-center min-h-[400px] border border-dashed border-border-dark/50 rounded-sm bg-card-alt/20">
-                <div className="w-16 h-16 rounded-full bg-surface border border-border-dark flex items-center justify-center mb-4">
+                <div className="w-16 h-16 rounded-full bg-surface  flex items-center justify-center mb-4">
                     <KanbanSquare className="text-text-muted opacity-50" size={24} />
                 </div>
                 <h3 className="font-heading font-black text-lg text-text-primary tracking-tight uppercase mb-2">Empty Pipeline</h3>
@@ -47,7 +47,7 @@ export default function PostPipelineView({ posts, clients, onPostClick }: PostPi
                 const stagePosts = posts.filter(p => p.status === stage);
 
                 return (
-                    <div key={stage} className="flex flex-col min-w-[300px] max-w-[300px] bg-background border border-border-dark rounded-sm">
+                    <div key={stage} className="flex flex-col min-w-[300px] max-w-[300px] bg-background  rounded-sm">
 
                         {/* Column Header */}
                         <div className="p-3 border-b border-border-dark flex justify-between items-center bg-card sticky top-0 z-10">
@@ -70,7 +70,7 @@ export default function PostPipelineView({ posts, clients, onPostClick }: PostPi
                                     >
                                         <CardHeader className="pb-2">
                                             <div className="flex justify-between items-start mb-2 gap-2">
-                                                <span className="text-[10px] uppercase font-mono tracking-widest text-text-muted bg-card-alt px-1.5 py-0.5 border border-border-dark rounded-sm capitalize">
+                                                <span className="text-[10px] uppercase font-mono tracking-widest text-text-muted bg-card-alt px-1.5 py-0.5  rounded-sm capitalize">
                                                     {post.platforms[0] || 'MULTI'}
                                                 </span>
                                                 <span className="text-[10px] text-primary font-mono shrink-0">{post.scheduledDate}</span>
@@ -87,7 +87,7 @@ export default function PostPipelineView({ posts, clients, onPostClick }: PostPi
                                                         <span className="text-primary/60">{client.name}</span>
                                                     )}
                                                 </div>
-                                                <div className="px-2 py-1 rounded bg-card-alt border border-border-dark text-[10px] font-mono text-text-primary uppercase tracking-wider">
+                                                <div className="px-2 py-1 rounded bg-card-alt  text-[10px] font-mono text-text-primary uppercase tracking-wider">
                                                     {post.assignedTo}
                                                 </div>
                                             </div>

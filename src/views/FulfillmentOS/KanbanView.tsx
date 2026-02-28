@@ -16,7 +16,7 @@ export default function KanbanView({ tasks, onTaskClick }: { tasks: any[], onTas
   if (tasks.length === 0) {
     return (
       <div className="flex-1 flex flex-col items-center justify-center min-h-0 border border-dashed border-border-dark/50 rounded-sm bg-card-alt/20">
-        <div className="w-16 h-16 rounded-full bg-surface border border-border-dark flex items-center justify-center mb-4">
+        <div className="w-16 h-16 rounded-full bg-surface  flex items-center justify-center mb-4">
           <Calendar className="text-text-muted" size={24} />
         </div>
         <h3 className="font-heading font-black text-lg text-text-primary tracking-tight uppercase mb-2">No Active Tasks</h3>
@@ -35,11 +35,11 @@ export default function KanbanView({ tasks, onTaskClick }: { tasks: any[], onTas
 
         return (
           <div key={col}
-            className="flex flex-col min-h-0 bg-card-alt/30 border border-border-dark/30 rounded-sm p-3
+            className="flex flex-col min-h-0 bg-card-alt/30 /30 rounded-sm p-3
                           flex-shrink-0 w-[80vw] md:w-auto md:flex-1 snap-child">
             {/* Column Header */}
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-mono text-[10px] tracking-widest text-text-muted uppercase truncate pr-2">{col}</h3>
+              <h3 className="font-mono text-xs font-medium text-text-muted truncate pr-2">{col}</h3>
               <Badge variant="outline" className="bg-card-alt shrink-0">{colTasks.length}</Badge>
             </div>
 

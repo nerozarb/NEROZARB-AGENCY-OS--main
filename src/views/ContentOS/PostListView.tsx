@@ -42,7 +42,7 @@ export default function PostListView({ posts, clients, onPostClick }: PostListVi
     }, [posts, filterStatus, filterPlatform, filterOverdue, sortAsc, today]);
 
     return (
-        <motion.div variants={itemVariants} className="bg-card border border-border-dark rounded-sm flex-1 flex flex-col min-h-0 overflow-hidden">
+        <motion.div variants={itemVariants} className="bg-card  rounded-sm flex-1 flex flex-col min-h-0 overflow-hidden">
 
             {/* Filter Bar */}
             <div className="p-3 border-b border-border-dark flex items-center gap-3 flex-wrap flex-shrink-0 bg-card-alt">
@@ -54,7 +54,7 @@ export default function PostListView({ posts, clients, onPostClick }: PostListVi
                 <select
                     value={filterStatus}
                     onChange={e => setFilterStatus(e.target.value as any)}
-                    className="bg-background border border-border-dark rounded-sm px-2 py-1 text-xs text-text-primary outline-none focus:border-primary"
+                    className="bg-background  rounded-sm px-2 py-1 text-xs text-text-primary outline-none focus:border-primary"
                 >
                     <option value="all">All Stages</option>
                     {ALL_STAGES.map(s => <option key={s} value={s}>{s}</option>)}
@@ -63,7 +63,7 @@ export default function PostListView({ posts, clients, onPostClick }: PostListVi
                 <select
                     value={filterPlatform}
                     onChange={e => setFilterPlatform(e.target.value as any)}
-                    className="bg-background border border-border-dark rounded-sm px-2 py-1 text-xs text-text-primary outline-none focus:border-primary capitalize"
+                    className="bg-background  rounded-sm px-2 py-1 text-xs text-text-primary outline-none focus:border-primary capitalize"
                 >
                     <option value="all">All Platforms</option>
                     {ALL_PLATFORMS.map(p => <option key={p} value={p} className="capitalize">{p}</option>)}
@@ -122,7 +122,7 @@ export default function PostListView({ posts, clients, onPostClick }: PostListVi
                                         <div className="text-xs capitalize text-text-primary">{post.platforms.join(', ')}</div>
                                     </td>
                                     <td className="p-4">
-                                        <span className="text-xs bg-card-alt px-2 py-1 rounded-sm border border-border-dark text-text-muted">
+                                        <span className="text-xs bg-card-alt px-2 py-1 rounded-sm  text-text-muted">
                                             {post.postType}
                                         </span>
                                     </td>

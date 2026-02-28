@@ -77,7 +77,7 @@ export default function FulfillmentOS({ onNavigate }: { onNavigate?: (view: stri
 
         {/* Controls Row — scrollable on mobile */}
         <div className="flex flex-wrap items-center gap-2 overflow-x-auto pb-1">
-          <div className="flex bg-card border border-border-dark rounded-sm p-1 gap-1 text-sm">
+          <div className="flex bg-card  rounded-sm p-1 gap-1 text-sm">
             <select
               value={clientFilter}
               onChange={(e) => setClientFilter(e.target.value === 'all' ? 'all' : Number(e.target.value))}
@@ -119,7 +119,7 @@ export default function FulfillmentOS({ onNavigate }: { onNavigate?: (view: stri
           </div>
 
           {/* View Toggles */}
-          <div className="flex bg-card border border-border-dark rounded-sm p-1">
+          <div className="flex bg-card  rounded-sm p-1">
             <button
               onClick={() => setViewMode('kanban')}
               className={`p-2 rounded-sm transition-colors ${viewMode === 'kanban' ? 'bg-card-alt text-primary' : 'text-text-muted hover:text-text-primary'}`}

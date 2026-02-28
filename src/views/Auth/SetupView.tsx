@@ -45,7 +45,7 @@ export default function SetupView({ onInitialize }: SetupViewProps) {
             <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="w-full max-w-md bg-card border border-border-dark p-8 rounded-sm shadow-2xl"
+                className="w-full max-w-md bg-card  p-8 rounded-sm shadow-2xl"
             >
                 <div className="mb-8 border-b border-border-dark pb-6">
                     <h1 className="font-heading text-xl tracking-tighter text-text-primary uppercase">Initialize System</h1>
@@ -60,14 +60,14 @@ export default function SetupView({ onInitialize }: SetupViewProps) {
                             value={ceoPassphrase}
                             onChange={(e) => setCeoPassphrase(e.target.value)}
                             placeholder="Set CEO Passphrase"
-                            className="w-full bg-card-alt border border-border-dark px-4 py-3 font-mono text-sm text-text-primary focus:outline-none focus:border-primary transition-colors"
+                            className="w-full bg-card-alt  px-4 py-3 font-mono text-sm text-text-primary focus:outline-none focus:border-primary transition-colors"
                         />
                         <input
                             type="password"
                             value={confirmCeo}
                             onChange={(e) => setConfirmCeo(e.target.value)}
                             placeholder="Confirm CEO Passphrase"
-                            className="w-full bg-card-alt border border-border-dark px-4 py-3 font-mono text-sm text-text-primary focus:outline-none focus:border-primary transition-colors"
+                            className="w-full bg-card-alt  px-4 py-3 font-mono text-sm text-text-primary focus:outline-none focus:border-primary transition-colors"
                         />
                     </div>
 
@@ -78,14 +78,14 @@ export default function SetupView({ onInitialize }: SetupViewProps) {
                             value={teamPassphrase}
                             onChange={(e) => setTeamPassphrase(e.target.value)}
                             placeholder="Set Team Passphrase"
-                            className="w-full bg-card-alt border border-border-dark px-4 py-3 font-mono text-sm text-text-primary focus:outline-none focus:border-primary transition-colors"
+                            className="w-full bg-card-alt  px-4 py-3 font-mono text-sm text-text-primary focus:outline-none focus:border-primary transition-colors"
                         />
                         <input
                             type="password"
                             value={confirmTeam}
                             onChange={(e) => setConfirmTeam(e.target.value)}
                             placeholder="Confirm Team Passphrase"
-                            className="w-full bg-card-alt border border-border-dark px-4 py-3 font-mono text-sm text-text-primary focus:outline-none focus:border-primary transition-colors"
+                            className="w-full bg-card-alt  px-4 py-3 font-mono text-sm text-text-primary focus:outline-none focus:border-primary transition-colors"
                         />
                     </div>
 

@@ -94,7 +94,7 @@ export default function PostDetailModal({ isOpen, onClose, post, onNavigate }: P
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="relative w-full max-w-6xl max-h-[95vh] bg-card border border-border-dark rounded-sm shadow-2xl flex flex-col overflow-hidden"
+            className="relative w-full max-w-6xl max-h-[95vh] bg-card  rounded-sm shadow-2xl flex flex-col overflow-hidden"
           >
             {/* Header */}
             <div className="p-5 border-b border-border-dark flex justify-between items-center bg-card-alt shrink-0">
@@ -107,7 +107,7 @@ export default function PostDetailModal({ isOpen, onClose, post, onNavigate }: P
                 )}
                 <div className="flex gap-1.5">
                   {post.platforms.map(p => (
-                    <span key={p} className="text-[10px] uppercase font-mono tracking-widest text-text-muted bg-background px-2 py-1 border border-border-dark rounded-sm capitalize">
+                    <span key={p} className="text-[10px] uppercase font-mono tracking-widest text-text-muted bg-background px-2 py-1  rounded-sm capitalize">
                       {p}
                     </span>
                   ))}
@@ -176,7 +176,7 @@ export default function PostDetailModal({ isOpen, onClose, post, onNavigate }: P
                 <section className="space-y-6">
                   <h4 className="font-mono text-sm tracking-widest text-text-primary border-b border-border-dark pb-2">CONTENT PREVIEW</h4>
 
-                  <div className="bg-background border border-border-dark/50 rounded-sm p-6 space-y-6 relative overflow-hidden">
+                  <div className="bg-background /50 rounded-sm p-6 space-y-6 relative overflow-hidden">
                     <div className="absolute top-0 left-0 w-0.5 h-full bg-primary/50" />
 
                     {/* Hook */}
@@ -215,7 +215,7 @@ export default function PostDetailModal({ isOpen, onClose, post, onNavigate }: P
                 {/* Visual Brief */}
                 <section className="space-y-4">
                   <h4 className="font-mono text-sm tracking-widest text-text-primary border-b border-border-dark pb-2">VISUAL BRIEF</h4>
-                  <div className="p-4 bg-card-alt border border-border-dark rounded-sm">
+                  <div className="p-4 bg-card-alt  rounded-sm">
                     <div className="flex justify-between items-start mb-3">
                       <Badge variant="outline">{post.templateType || 'Custom'}</Badge>
                       <span className="text-[10px] font-mono uppercase text-text-muted">{post.postType}</span>
@@ -369,7 +369,7 @@ export default function PostDetailModal({ isOpen, onClose, post, onNavigate }: P
                               type="number"
                               value={metrics[field] ?? 0}
                               onChange={e => setMetrics({ ...metrics, [field]: Number(e.target.value) })}
-                              className="w-full bg-card p-1.5 text-xs text-text-primary border border-border-dark rounded-sm outline-none focus:border-primary"
+                              className="w-full bg-card p-1.5 text-xs text-text-primary  rounded-sm outline-none focus:border-primary"
                             />
                           </div>
                         ))}
@@ -380,7 +380,7 @@ export default function PostDetailModal({ isOpen, onClose, post, onNavigate }: P
                         <select
                           value={metrics.ceoRating}
                           onChange={e => setMetrics({ ...metrics, ceoRating: e.target.value as PerformanceLog['ceoRating'] })}
-                          className="w-full bg-card p-2 text-sm text-text-primary border border-border-dark rounded-sm outline-none focus:border-primary"
+                          className="w-full bg-card p-2 text-sm text-text-primary  rounded-sm outline-none focus:border-primary"
                         >
                           <option value="🔴 Underperformed">🔴 Underperformed</option>
                           <option value="🟡 Performed">🟡 Performed</option>
@@ -395,7 +395,7 @@ export default function PostDetailModal({ isOpen, onClose, post, onNavigate }: P
                           onChange={e => setMetrics({ ...metrics, notes: e.target.value })}
                           placeholder="Notes for the Knowledge Vault..."
                           rows={3}
-                          className="w-full bg-card p-2 text-xs text-text-primary border border-border-dark rounded-sm outline-none focus:border-primary resize-none"
+                          className="w-full bg-card p-2 text-xs text-text-primary  rounded-sm outline-none focus:border-primary resize-none"
                         />
                       </div>
 
@@ -407,12 +407,12 @@ export default function PostDetailModal({ isOpen, onClose, post, onNavigate }: P
                   ) : post.performance ? (
                     <div className="space-y-4">
                       <div className="grid grid-cols-2 gap-3">
-                        <div className="bg-background border border-border-dark p-3 rounded-sm">
+                        <div className="bg-background  p-3 rounded-sm">
                           <div className="text-[10px] uppercase text-text-muted mb-1">Save Rate</div>
                           <div className="text-2xl font-heading text-primary">{post.performance.saveRate}%</div>
                           <div className="text-[10px] mt-1 opacity-60">{post.performance.saves} saves / {post.performance.reach?.toLocaleString?.()} reach</div>
                         </div>
-                        <div className="bg-background border border-border-dark p-3 rounded-sm">
+                        <div className="bg-background  p-3 rounded-sm">
                           <div className="text-[10px] uppercase text-text-muted mb-1">Share Rate</div>
                           <div className="text-2xl font-heading text-secondary">{post.performance.shareRate}%</div>
                           <div className="text-[10px] mt-1 opacity-60">{post.performance.shares} shares</div>
@@ -425,12 +425,12 @@ export default function PostDetailModal({ isOpen, onClose, post, onNavigate }: P
                           { k: 'Likes', v: post.performance.likes },
                           { k: 'Comments', v: post.performance.comments },
                         ].map(({ k, v }) => (
-                          <span key={k} className="bg-background px-2 py-1 rounded-sm border border-border-dark text-text-muted">
+                          <span key={k} className="bg-background px-2 py-1 rounded-sm  text-text-muted">
                             {k}: {(v || 0).toLocaleString()}
                           </span>
                         ))}
                       </div>
-                      <div className="p-3 bg-background border border-border-dark rounded-sm">
+                      <div className="p-3 bg-background  rounded-sm">
                         <div className="text-[10px] text-text-muted mb-1">CEO Rating</div>
                         <div className="text-sm">{post.performance.ceoRating}</div>
                         {post.performance.notes && (

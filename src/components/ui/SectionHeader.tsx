@@ -12,7 +12,7 @@ export function SectionHeader({ module, title }: SectionHeaderProps) {
             <div className="flex items-center gap-3 mb-2">
                 <Tag color="#A8C69F">{module}</Tag>
             </div>
-            <h1 className="font-heading text-4xl tracking-tighter uppercase text-text-primary">
+            <h1 className="font-heading text-4xl tracking-tighter capitalize text-text-primary">
                 {title}
             </h1>
         </div>

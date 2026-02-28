@@ -126,17 +126,17 @@ export default function RosterView({ onSelectClient }: { onSelectClient: (id: st
             placeholder="Search clients..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-card border border-border-dark pl-10 pr-4 py-2 font-mono text-[11px] tracking-widest text-text-primary placeholder:text-text-muted/50 focus:outline-none focus:border-primary transition-all"
+            className="w-full bg-card  pl-10 pr-4 py-2 font-mono text-[11px] tracking-widest text-text-primary placeholder:text-text-muted/50 focus:outline-none focus:border-primary transition-all"
           />
         </div>
         <div className="flex gap-2 sm:gap-4">
-          <div className="flex items-center gap-2 border border-border-dark bg-card px-3 py-2">
+          <div className="flex items-center gap-2  bg-card px-3 py-2">
             <Filter size={12} className="text-text-muted" />
             <select className="bg-transparent border-none text-text-primary font-mono text-[10px] tracking-wider focus:outline-none appearance-none pr-4">
               <option value="all">Filters: All</option>
             </select>
           </div>
-          <div className="flex items-center gap-2 border border-border-dark bg-card px-3 py-2">
+          <div className="flex items-center gap-2  bg-card px-3 py-2">
             <ArrowUpDown size={12} className="text-text-muted" />
             <select
               value={sortBy}
@@ -249,7 +249,7 @@ export default function RosterView({ onSelectClient }: { onSelectClient: (id: st
                         {authLevel === 'ceo' ? (
                           <>
                             <td className="p-4">
-                              <span className="font-mono text-[10px] px-2 py-1 border border-border-dark bg-card-alt text-text-secondary">{client.revenueGate}</span>
+                              <span className="font-mono text-[10px] px-2 py-1  bg-card-alt text-text-secondary">{client.revenueGate}</span>
                             </td>
                             <td className="p-4">
                               <span className="font-mono text-[12px] text-text-primary">{formatCurrency(client.ltv)}</span>
@@ -272,9 +272,9 @@ export default function RosterView({ onSelectClient }: { onSelectClient: (id: st
                         </td>
                         <td className="p-4 text-right">
                           <div className="flex items-center justify-end gap-3">
-                            <button className="font-mono text-[9px] uppercase tracking-wider text-text-muted hover:text-text-primary transition-colors" onClick={(e) => { e.stopPropagation(); /* edit logic */ }}>Edit</button>
+                            <button className="font-mono text-[9px] text-xs font-medium text-text-muted hover:text-text-primary transition-colors" onClick={(e) => { e.stopPropagation(); /* edit logic */ }}>Edit</button>
                             {authLevel === 'ceo' && (
-                              <button className="font-mono text-[9px] uppercase tracking-wider text-text-muted hover:text-red-500 transition-colors" onClick={(e) => { e.stopPropagation(); setClientToDelete(client); }}>Delete</button>
+                              <button className="font-mono text-[9px] text-xs font-medium text-text-muted hover:text-red-500 transition-colors" onClick={(e) => { e.stopPropagation(); setClientToDelete(client); }}>Delete</button>
                             )}
                           </div>
                         </td>

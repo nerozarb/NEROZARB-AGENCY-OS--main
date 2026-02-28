@@ -83,7 +83,7 @@ export default function MyTasksView({ tasks, onTaskClick }: MyTasksViewProps) {
     return (
         <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar space-y-8 pb-8">
             <div>
-                <h3 className="font-mono text-[10px] tracking-widest text-text-muted uppercase mb-4 flex items-center gap-2">
+                <h3 className="font-mono text-xs font-medium text-text-muted mb-4 flex items-center gap-2">
                     <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
                     OVERDUE ({categorizedTasks.overdue.length})
                 </h3>
@@ -97,7 +97,7 @@ export default function MyTasksView({ tasks, onTaskClick }: MyTasksViewProps) {
             </div>
 
             <div>
-                <h3 className="font-mono text-[10px] tracking-widest text-text-muted uppercase mb-4 flex items-center gap-2">
+                <h3 className="font-mono text-xs font-medium text-text-muted mb-4 flex items-center gap-2">
                     <span className="w-2 h-2 bg-yellow-500 rounded-full" />
                     DUE TODAY ({categorizedTasks.dueToday.length})
                 </h3>
@@ -111,7 +111,7 @@ export default function MyTasksView({ tasks, onTaskClick }: MyTasksViewProps) {
             </div>
 
             <div>
-                <h3 className="font-mono text-[10px] tracking-widest text-text-muted uppercase mb-4 flex items-center gap-2">
+                <h3 className="font-mono text-xs font-medium text-text-muted mb-4 flex items-center gap-2">
                     <span className="w-2 h-2 bg-primary rounded-full" />
                     DUE THIS WEEK ({categorizedTasks.dueThisWeek.length})
                 </h3>
@@ -126,7 +126,7 @@ export default function MyTasksView({ tasks, onTaskClick }: MyTasksViewProps) {
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <div>
-                    <h3 className="font-mono text-[10px] tracking-widest text-text-muted uppercase mb-4 flex items-center gap-2">
+                    <h3 className="font-mono text-xs font-medium text-text-muted mb-4 flex items-center gap-2">
                         <span className="w-2 h-2 bg-blue-500 rounded-full" />
                         UPCOMING ({categorizedTasks.upcoming.length})
                     </h3>
@@ -140,7 +140,7 @@ export default function MyTasksView({ tasks, onTaskClick }: MyTasksViewProps) {
                 </div>
 
                 <div>
-                    <h3 className="font-mono text-[10px] tracking-widest text-text-muted uppercase mb-4 flex items-center gap-2">
+                    <h3 className="font-mono text-xs font-medium text-text-muted mb-4 flex items-center gap-2">
                         <span className="w-2 h-2 bg-border-dark rounded-full" />
                         RECENTLY COMPLETED
                     </h3>

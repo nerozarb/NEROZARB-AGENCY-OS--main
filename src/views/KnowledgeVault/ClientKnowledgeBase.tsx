@@ -37,7 +37,7 @@ export function ClientKnowledgeBase({ clientId }: { clientId: number }) {
                     <div className="space-y-8 animate-fade-in">
                         <div>
                             <h3 className="font-heading text-lg text-primary uppercase tracking-wider border-b border-border-dark pb-2 mb-4">Shadow Avatar</h3>
-                            <div className="bg-card p-6 border border-border-dark rounded-sm">
+                            <div className="bg-card p-6  rounded-sm">
                                 <p className="text-sm font-mono leading-relaxed text-text-primary whitespace-pre-wrap">
                                     {client.shadowAvatar || 'No shadow avatar defined.'}
                                 </p>
@@ -45,7 +45,7 @@ export function ClientKnowledgeBase({ clientId }: { clientId: number }) {
                         </div>
                         <div>
                             <h3 className="font-heading text-lg text-[#F24E1E] uppercase tracking-wider border-b border-border-dark pb-2 mb-4">Bleeding Neck Problem</h3>
-                            <div className="bg-card p-6 border border-border-dark rounded-sm">
+                            <div className="bg-card p-6  rounded-sm">
                                 <p className="text-sm font-mono leading-relaxed text-text-primary whitespace-pre-wrap">
                                     {client.bleedingNeck || 'No bleeding neck problem defined.'}
                                 </p>
@@ -63,7 +63,7 @@ export function ClientKnowledgeBase({ clientId }: { clientId: number }) {
                             </div>
                         ) : (
                             brandProtocols.map(p => (
-                                <div key={p.id} className="bg-card border border-border-dark rounded-sm overflow-hidden">
+                                <div key={p.id} className="bg-card  rounded-sm overflow-hidden">
                                     <div className="p-4 bg-black/40 border-b border-border-dark">
                                         <h3 className="font-heading text-lg text-text-primary uppercase">{p.title}</h3>
                                     </div>
@@ -79,15 +79,15 @@ export function ClientKnowledgeBase({ clientId }: { clientId: number }) {
                 return (
                     <div className="space-y-6 animate-fade-in">
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div className="bg-card p-4 border border-border-dark rounded-sm">
+                            <div className="bg-card p-4  rounded-sm">
                                 <div className="text-[10px] font-mono uppercase tracking-widest text-text-muted mb-2">Top Format</div>
                                 <div className="font-heading text-xl text-primary">Carousel / Slider</div>
                             </div>
-                            <div className="bg-card p-4 border border-border-dark rounded-sm">
+                            <div className="bg-card p-4  rounded-sm">
                                 <div className="text-[10px] font-mono uppercase tracking-widest text-text-muted mb-2">Peak Engagement Time</div>
                                 <div className="font-heading text-xl text-primary">8:00 PM EST</div>
                             </div>
-                            <div className="bg-card p-4 border border-border-dark rounded-sm">
+                            <div className="bg-card p-4  rounded-sm">
                                 <div className="text-[10px] font-mono uppercase tracking-widest text-text-muted mb-2">Best Performing Hook</div>
                                 <div className="font-heading text-xl text-primary">"The hidden reason..."</div>
                             </div>
@@ -109,7 +109,7 @@ export function ClientKnowledgeBase({ clientId }: { clientId: number }) {
                             </div>
                         ) : (
                             researchProtocols.map(p => (
-                                <div key={p.id} className="bg-card border border-border-dark rounded-sm p-4 flex gap-4">
+                                <div key={p.id} className="bg-card  rounded-sm p-4 flex gap-4">
                                     <div className="mt-1"><FileText className="w-5 h-5 text-primary" /></div>
                                     <div>
                                         <h4 className="font-mono text-sm uppercase tracking-wider text-text-primary font-bold mb-2">{p.title}</h4>
@@ -129,10 +129,10 @@ export function ClientKnowledgeBase({ clientId }: { clientId: number }) {
                             <div className="space-y-8 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-border-dark before:to-transparent">
                                 {client.timeline.map((event, index) => (
                                     <div key={index} className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
-                                        <div className="flex items-center justify-center w-10 h-10 rounded-full border border-border-dark bg-[#0A0A0A] group-[.is-active]:bg-primary/10 group-[.is-active]:border-primary/50 text-text-muted group-[.is-active]:text-primary shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10 transition-colors">
+                                        <div className="flex items-center justify-center w-10 h-10 rounded-full  bg-[#0A0A0A] group-[.is-active]:bg-primary/10 group-[.is-active]:border-primary/50 text-text-muted group-[.is-active]:text-primary shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10 transition-colors">
                                             <Clock className="w-4 h-4" />
                                         </div>
-                                        <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] bg-card border border-border-dark p-4 rounded-sm shadow">
+                                        <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] bg-card  p-4 rounded-sm shadow">
                                             <div className="flex items-center justify-between mb-1">
                                                 <div className="font-mono text-xs text-text-secondary">{new Date(event.date).toLocaleDateString()}</div>
                                             </div>
@@ -148,7 +148,7 @@ export function ClientKnowledgeBase({ clientId }: { clientId: number }) {
                 return (
                     <div className="animate-fade-in">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="bg-card border border-border-dark p-4 rounded-sm flex items-center justify-between group cursor-pointer hover:border-border-dark/80 transition-colors">
+                            <div className="bg-card  p-4 rounded-sm flex items-center justify-between group cursor-pointer hover:border-border-dark/80 transition-colors">
                                 <div className="flex items-center gap-3">
                                     <div className="p-2 bg-white/5 rounded-sm"><LinkIcon className="w-4 h-4 text-text-secondary" /></div>
                                     <div>
@@ -158,7 +158,7 @@ export function ClientKnowledgeBase({ clientId }: { clientId: number }) {
                                 </div>
                                 <Button variant="ghost" size="sm" className="opacity-0 group-hover:opacity-100 transition-opacity">Open</Button>
                             </div>
-                            <div className="bg-card border border-border-dark p-4 rounded-sm flex items-center justify-between group cursor-pointer hover:border-border-dark/80 transition-colors">
+                            <div className="bg-card  p-4 rounded-sm flex items-center justify-between group cursor-pointer hover:border-border-dark/80 transition-colors">
                                 <div className="flex items-center gap-3">
                                     <div className="p-2 bg-white/5 rounded-sm"><LinkIcon className="w-4 h-4 text-text-secondary" /></div>
                                     <div>
@@ -186,7 +186,7 @@ export function ClientKnowledgeBase({ clientId }: { clientId: number }) {
                         onClick={() => setActiveTab(tab.id)}
                         className={`flex items-center gap-2 px-4 py-2 rounded-sm text-[10px] font-mono uppercase tracking-widest transition-colors whitespace-nowrap ${activeTab === tab.id
                             ? 'bg-primary/10 text-primary border border-primary/50'
-                            : 'bg-card border border-border-dark text-text-secondary hover:text-text-primary hover:border-text-secondary'
+                            : 'bg-card  text-text-secondary hover:text-text-primary hover:border-text-secondary'
                             }`}
                     >
                         {tab.icon}

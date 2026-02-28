@@ -27,7 +27,7 @@ export const AiPromptCard: React.FC<AiPromptCardProps> = ({ protocol, onClick, o
     return (
         <div
             onClick={onClick}
-            className="group relative bg-[#0A0A0A] border border-border-dark rounded-sm overflow-hidden hover:border-border-dark/80 hover:shadow-[0_8px_30px_rgba(0,0,0,0.12)] transition-all cursor-pointer flex flex-col h-full"
+            className="group relative bg-[#0A0A0A]  rounded-sm overflow-hidden hover:border-border-dark/80 hover:shadow-[0_8px_30px_rgba(0,0,0,0.12)] transition-all cursor-pointer flex flex-col h-full"
         >
             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary/20 via-primary/60 to-primary/20" />
 
@@ -67,7 +67,7 @@ export const AiPromptCard: React.FC<AiPromptCardProps> = ({ protocol, onClick, o
                         )}
                     </button>
 
-                    <button className="px-3 py-2 text-xs font-mono text-text-secondary border border-border-dark hover:bg-white/5 transition-colors rounded-sm uppercase tracking-widest">
+                    <button className="px-3 py-2 text-xs font-mono text-text-secondary  hover:bg-white/5 transition-colors rounded-sm uppercase tracking-widest">
                         View
                     </button>
                 </div>

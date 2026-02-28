@@ -25,7 +25,7 @@ export default function ListView({ tasks, onTaskClick }: { tasks: any[], onTaskC
               <tr>
                 <td colSpan={8} className="p-12 text-center">
                   <div className="flex flex-col items-center justify-center text-text-muted">
-                    <div className="w-12 h-12 rounded-full bg-surface border border-border-dark flex items-center justify-center mb-3">
+                    <div className="w-12 h-12 rounded-full bg-surface  flex items-center justify-center mb-3">
                       <ChevronRight className="opacity-50" size={20} />
                     </div>
                     <p className="font-heading font-bold text-sm text-text-primary tracking-tight uppercase mb-1">No Tasks Found</p>

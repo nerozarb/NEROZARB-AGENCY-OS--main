@@ -61,7 +61,7 @@ export default function ClientDetailView({ clientId, onBack, onNavigate }: { cli
         <div className="flex items-center gap-8">
           <button
             onClick={onBack}
-            className="w-10 h-10 border border-border-dark rounded-sm flex items-center justify-center text-text-muted hover:text-text-primary hover:border-text-muted transition-all"
+            className="w-10 h-10  rounded-sm flex items-center justify-center text-text-muted hover:text-text-primary hover:border-text-muted transition-all"
           >
             <ArrowLeft size={18} />
           </button>
@@ -86,7 +86,7 @@ export default function ClientDetailView({ clientId, onBack, onNavigate }: { cli
           <Button
             onClick={() => onNavigate?.('vault', client.id.toString())}
             variant="ghost"
-            className="font-mono text-[10px] tracking-widest uppercase border border-border-dark"
+            className="font-mono text-[10px] tracking-widest uppercase "
           >
             <BookOpen className="w-3 h-3 mr-2 inline-block" />
             KNOWLEDGE BASE
@@ -94,7 +94,7 @@ export default function ClientDetailView({ clientId, onBack, onNavigate }: { cli
           <Button
             onClick={() => setIsEditModalOpen(true)}
             variant="ghost"
-            className="font-mono text-[10px] tracking-widest uppercase border border-border-dark"
+            className="font-mono text-[10px] tracking-widest uppercase "
           >
             EDIT PROFILE
           </Button>
@@ -105,7 +105,7 @@ export default function ClientDetailView({ clientId, onBack, onNavigate }: { cli
             {client.status === 'Active Sprint' ? 'VIEW SPRINT' : 'INITIALIZE SPRINT'}
           </Button>
           <Button
-            className="bg-card-alt border border-border-dark hover:border-primary text-text-primary font-mono text-[10px] tracking-widest uppercase px-6"
+            className="bg-card-alt  hover:border-primary text-text-primary font-mono text-[10px] tracking-widest uppercase px-6"
             onClick={() => onNavigate?.('content', client.id.toString())}
           >
             VIEW CALENDAR
@@ -183,7 +183,7 @@ export default function ClientDetailView({ clientId, onBack, onNavigate }: { cli
               </div>
               <div className="space-y-4">
                 <h4 className="font-mono text-[10px] text-text-muted tracking-widest uppercase">Internal Notes</h4>
-                <div className="w-full text-xs text-text-secondary leading-loose bg-card-alt/30 p-4 border border-border-dark rounded-sm">
+                <div className="w-full text-xs text-text-secondary leading-loose bg-card-alt/30 p-4  rounded-sm">
                   {client.notes || 'No internal notes found for this client.'}
                 </div>
               </div>

@@ -27,7 +27,7 @@ export const ProtocolCard: React.FC<ProtocolCardProps> = ({ protocol, onClick, o
     return (
         <div
             onClick={onClick}
-            className="group relative bg-card border border-border-dark rounded-sm overflow-hidden hover:border-border-dark/80 hover:shadow-[0_8px_30px_rgba(0,0,0,0.12)] transition-all cursor-pointer flex flex-col h-full"
+            className="group relative bg-card  rounded-sm overflow-hidden hover:border-border-dark/80 hover:shadow-[0_8px_30px_rgba(0,0,0,0.12)] transition-all cursor-pointer flex flex-col h-full"
         >
             {/* Top Accent Bar */}
             <div className={`absolute top-0 left-0 right-0 h-1 ${accentColor}`} />

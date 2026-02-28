@@ -106,7 +106,7 @@ export default function ClientEditModal({ isOpen, onClose, client }: ClientEditM
                     initial={{ opacity: 0, scale: 0.95, y: 20 }}
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                    className="w-full max-w-2xl bg-surface border border-border-dark shadow-2xl flex flex-col max-h-[90vh] relative z-10"
+                    className="w-full max-w-2xl bg-surface  shadow-2xl flex flex-col max-h-[90vh] relative z-10"
                 >
                     <div className="flex items-center justify-between p-6 border-b border-border-dark">
                         <div>
@@ -174,7 +174,7 @@ export default function ClientEditModal({ isOpen, onClose, client }: ClientEditM
                                         <textarea
                                             value={formData.shadowAvatar}
                                             onChange={(e) => setFormData({ ...formData, shadowAvatar: e.target.value })}
-                                            className="w-full bg-card border border-border-dark px-4 py-3 text-sm text-text-primary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/50 min-h-[80px]"
+                                            className="w-full bg-card  px-4 py-3 text-sm text-text-primary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/50 min-h-[80px]"
                                         />
                                     </div>
                                     <div className="space-y-1">
@@ -182,7 +182,7 @@ export default function ClientEditModal({ isOpen, onClose, client }: ClientEditM
                                         <textarea
                                             value={formData.bleedingNeck}
                                             onChange={(e) => setFormData({ ...formData, bleedingNeck: e.target.value })}
-                                            className="w-full bg-card border border-border-dark px-4 py-3 text-sm text-text-primary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/50 min-h-[80px]"
+                                            className="w-full bg-card  px-4 py-3 text-sm text-text-primary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/50 min-h-[80px]"
                                         />
                                     </div>
                                 </div>

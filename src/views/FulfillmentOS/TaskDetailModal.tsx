@@ -117,7 +117,7 @@ export default function TaskDetailModal({ isOpen, onClose, task: modalTask, onNa
           {/* Left: Brief & Assets (66%) */}
           <div className="col-span-2 space-y-6">
             <div className="space-y-3">
-              <h4 className="font-mono text-[10px] tracking-widest text-text-muted uppercase flex items-center gap-2">
+              <h4 className="font-mono text-xs font-medium text-text-muted flex items-center gap-2">
                 <Paperclip size={14} />
                 Strategic Brief
               </h4>
@@ -127,7 +127,7 @@ export default function TaskDetailModal({ isOpen, onClose, task: modalTask, onNa
             </div>
 
             <div className="space-y-4 pt-4 border-t border-border-dark">
-              <h4 className="font-mono text-[10px] tracking-widest text-text-muted uppercase flex items-center gap-2">
+              <h4 className="font-mono text-xs font-medium text-text-muted flex items-center gap-2">
                 <MessageSquare size={14} />
                 Activity Log
               </h4>
@@ -164,7 +164,7 @@ export default function TaskDetailModal({ isOpen, onClose, task: modalTask, onNa
 
               {/* Add Note Input */}
               <div className="flex gap-2 mt-4">
-                <div className="flex-1 bg-card-alt border border-border-dark p-1 flex items-center focus-within:border-primary transition-colors">
+                <div className="flex-1 bg-card-alt  p-1 flex items-center focus-within:border-primary transition-colors">
                   <PenLine size={14} className="text-text-muted ml-2 shrink-0" />
                   <input
                     type="text"
@@ -175,7 +175,7 @@ export default function TaskDetailModal({ isOpen, onClose, task: modalTask, onNa
                     onKeyDown={e => e.key === 'Enter' && handleAddNote()}
                   />
                 </div>
-                <Button variant="ghost" className="px-4 border border-border-dark shrink-0" onClick={handleAddNote}>
+                <Button variant="ghost" className="px-4  shrink-0" onClick={handleAddNote}>
                   POST
                 </Button>
               </div>
@@ -185,7 +185,7 @@ export default function TaskDetailModal({ isOpen, onClose, task: modalTask, onNa
           {/* Right: Details & Meta (33%) */}
           <div className="space-y-6">
             <div className="space-y-4">
-              <h4 className="font-mono text-[10px] tracking-widest text-text-muted uppercase">Metadata</h4>
+              <h4 className="font-mono text-xs font-medium text-text-muted">Metadata</h4>
 
               <div className="space-y-3">
                 <div className="flex items-center justify-between text-sm">

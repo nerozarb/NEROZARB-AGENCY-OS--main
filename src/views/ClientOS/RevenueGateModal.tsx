@@ -83,7 +83,7 @@ export default function RevenueGateModal({ isOpen, onClose, onClientCreated }: R
                     initial={{ opacity: 0, scale: 0.95, y: 20 }}
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                    className="w-full max-w-2xl bg-surface border border-border-dark shadow-2xl flex flex-col max-h-[90vh] relative z-10"
+                    className="w-full max-w-2xl bg-surface  shadow-2xl flex flex-col max-h-[90vh] relative z-10"
                 >
                     {/* Header */}
                     <div className="flex items-center justify-between p-6 border-b border-border-dark">
