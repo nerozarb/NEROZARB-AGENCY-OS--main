@@ -10,7 +10,7 @@ import KnowledgeVault from './views/KnowledgeVault';
 import OnboardingOS from './views/OnboardingOS';
 import { loadData, saveData, AppData } from './utils/storage';
 import { AppDataProvider } from './contexts/AppDataContext';
-import { fetchAppDataFromSupabase } from './utils/supabaseSync';
+import { fetchAppDataFromSupabase, syncSettingsToSupabase } from './utils/supabaseSync';
 
 export default function App() {
   const [data, setData] = useState<AppData>(loadData());
@@ -43,15 +43,40 @@ export default function App() {
   }, [data, isLoading]);
 
   const handleInitialize = (ceoHash: string, teamHash: string) => {
+    const newSettings = {
+      ceoPhraseHash: ceoHash,
+      teamPhraseHash: teamHash,
+      initialized: true,
+      lastUpdated: new Date().toISOString(),
+    };
+
     setData((prev) => ({
       ...prev,
-      settings: {
-        ...prev.settings,
-        ceoPhraseHash: ceoHash,
-        teamPhraseHash: teamHash,
-        initialized: true,
-      },
+      settings: newSettings,
     }));
+
+    // Sync to Supabase
+    syncSettingsToSupabase(newSettings);
+  };
+
+  const handleReset = () => {
+    const resetSettings = {
+      ceoPhraseHash: null,
+      teamPhraseHash: null,
+      initialized: false,
+      lastUpdated: new Date().toISOString(),
+    };
+
+    setData((prev) => ({
+      ...prev,
+      settings: resetSettings,
+    }));
+
+    // Sync to Supabase
+    syncSettingsToSupabase(resetSettings);
+
+    // Clear local storage to be sure
+    localStorage.removeItem('nerozarb-os-v2');
   };
 
   const handleLogin = (level: 'ceo' | 'team') => {
@@ -89,6 +114,7 @@ export default function App() {
       <AppDataProvider data={data} setData={setData}>
         <LoginView
           onLogin={handleLogin}
+          onReset={handleReset}
           ceoHash={data.settings.ceoPhraseHash || ''}
           teamHash={data.settings.teamPhraseHash || ''}
         />

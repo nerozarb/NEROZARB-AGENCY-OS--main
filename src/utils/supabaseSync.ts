@@ -153,6 +153,14 @@ const mapOnboarding = (row: any): OnboardingProtocol => ({
     lastUpdated: row.last_updated ?? row.lastUpdated ?? new Date().toISOString(),
 });
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const mapSettings = (row: any): AppData['settings'] => ({
+    ceoPhraseHash: row.ceoPhraseHash ?? row.ceo_phrase_hash ?? null,
+    teamPhraseHash: row.teamPhraseHash ?? row.team_phrase_hash ?? null,
+    initialized: row.initialized ?? false,
+    lastUpdated: row.lastUpdated ?? row.last_updated ?? null,
+});
+
 // ─────────────────────────────────────────────────────────────────────────────
 // FETCH
 // ─────────────────────────────────────────────────────────────────────────────
@@ -161,12 +169,13 @@ export const fetchAppDataFromSupabase = async (): Promise<Partial<AppData> | nul
     if (!isSupabaseConfigured()) return null;
 
     try {
-        const [clientsRes, tasksRes, postsRes, protocolsRes, onboardingsRes] = await Promise.all([
+        const [clientsRes, tasksRes, postsRes, protocolsRes, onboardingsRes, settingsRes] = await Promise.all([
             supabase.from('clients').select('*'),
             supabase.from('tasks').select('*'),
             supabase.from('posts').select('*'),
             supabase.from('protocols').select('*'),
-            supabase.from('onboardings').select('*')
+            supabase.from('onboardings').select('*'),
+            supabase.from('settings').select('*').eq('id', 'global').single()
         ]);
 
         if (clientsRes.error) throw clientsRes.error;
@@ -181,6 +190,7 @@ export const fetchAppDataFromSupabase = async (): Promise<Partial<AppData> | nul
             posts: (postsRes.data ?? []).map(mapPost),
             protocols: (protocolsRes.data ?? []).map(mapProtocol),
             onboardings: (onboardingsRes.data ?? []).map(mapOnboarding),
+            settings: settingsRes.data ? mapSettings(settingsRes.data) : undefined,
         };
     } catch (e) {
         console.error('Failed to fetch from Supabase. Falling back to local storage.', e);
@@ -290,5 +300,20 @@ export const syncOnboardingToSupabase = async (onboarding: OnboardingProtocol, i
         }
     } catch (e) {
         console.error('Failed to sync onboarding to Supabase', e);
+    }
+};
+
+export const syncSettingsToSupabase = async (settings: AppData['settings']) => {
+    if (!isSupabaseConfigured()) return;
+    try {
+        await supabase.from('settings').upsert({
+            id: 'global',
+            ceoPhraseHash: settings.ceoPhraseHash,
+            teamPhraseHash: settings.teamPhraseHash,
+            initialized: settings.initialized,
+            lastUpdated: settings.lastUpdated
+        });
+    } catch (e) {
+        console.error('Failed to sync settings to Supabase', e);
     }
 };
