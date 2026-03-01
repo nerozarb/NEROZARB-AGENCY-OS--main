@@ -1,4 +1,4 @@
-import { useState, DragEvent } from 'react';
+import { useState, useMemo, DragEvent } from 'react';
 import { motion } from 'motion/react';
 import { Card } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
@@ -64,6 +64,13 @@ export default function KanbanView({ tasks, onTaskClick }: { tasks: any[], onTas
     advanceTaskStage(taskId, targetStage, 'ceo');
   };
 
+  // Pre-compute column → tasks mapping (avoids re-filtering on every drag state change)
+  const columnTasks = useMemo(() => {
+    const map = new Map<Stage, typeof tasks>();
+    COLUMNS.forEach(col => map.set(col, tasks.filter(t => t.status === col)));
+    return map;
+  }, [tasks]);
+
   if (tasks.length === 0) {
     return (
       <div className="flex-1 flex flex-col items-center justify-center min-h-0 border border-dashed border-border-dark/50 rounded-sm bg-card-alt/20">
@@ -82,7 +89,7 @@ export default function KanbanView({ tasks, onTaskClick }: { tasks: any[], onTas
     <div className="flex-1 flex overflow-x-auto gap-3 md:gap-3 min-h-0 pb-2 snap-scroll-x scroll-touch"
       style={{ WebkitOverflowScrolling: 'touch' }}>
       {COLUMNS.map((col) => {
-        const colTasks = tasks.filter(t => t.status === col);
+        const colTasks = columnTasks.get(col) || [];
         const isOver = dragOverCol === col;
 
         return (
@@ -121,7 +128,7 @@ export default function KanbanView({ tasks, onTaskClick }: { tasks: any[], onTas
                       <Badge variant="outline" className="bg-card-alt truncate max-w-[100px] text-[10px]">{task.client}</Badge>
                       <div className="flex items-center gap-1.5">
                         <div className={`w-2 h-2 rounded-full shrink-0 ${task.priority === 'critical' ? 'bg-red-500' :
-                            task.priority === 'high' ? 'bg-orange-500' : 'bg-primary'
+                          task.priority === 'high' ? 'bg-orange-500' : 'bg-primary'
                           }`} />
                         <GripVertical size={12} className="text-text-muted/40 group-hover:text-text-muted transition-colors" />
                       </div>

@@ -159,7 +159,7 @@ export default function NewPostModal({ isOpen, onClose, post, prefilledDate }: N
                         </div>
 
                         {/* Content (Scrollable) */}
-                        <div className="p-8 overflow-y-auto flex-1 space-y-10 custom-scrollbar">
+                        <div className="p-8 overflow-y-auto flex-1 space-y-10 custom-scrollbar min-h-0">
 
                             {/* SECTION 1: IDENTIFICATION */}
                             <section className="space-y-6">

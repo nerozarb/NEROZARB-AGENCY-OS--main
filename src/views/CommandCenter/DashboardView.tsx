@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { motion } from 'motion/react';
 import { Card } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
@@ -20,18 +21,27 @@ export default function DashboardView({ onNavigate }: { onNavigate?: (view: stri
     show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
   };
 
-  // KPI Calculations
+  // KPI Calculations — memoized to avoid recomputation on unrelated re-renders
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(amount);
   };
 
-  const activeClients = data.clients.filter(c => c.status === 'Active Sprint' || c.status === 'Retainer');
-  const cashCollected = activeClients.reduce((sum, client) => sum + (client.ltv || 0), 0);
-
-  const pipelineLeads = data.clients.filter(c => c.status === 'Lead' || c.status === 'Discovery').length;
-
-  const todayDate = new Date().toISOString().split('T')[0];
-  const frictionAlerts = data.tasks.filter(t => t.deadline && t.deadline < todayDate && t.status !== 'Deployed').length;
+  const activeClients = useMemo(() =>
+    data.clients.filter(c => c.status === 'Active Sprint' || c.status === 'Retainer'),
+    [data.clients]
+  );
+  const cashCollected = useMemo(() =>
+    activeClients.reduce((sum, client) => sum + (client.ltv || 0), 0),
+    [activeClients]
+  );
+  const pipelineLeads = useMemo(() =>
+    data.clients.filter(c => c.status === 'Lead' || c.status === 'Discovery').length,
+    [data.clients]
+  );
+  const frictionAlerts = useMemo(() => {
+    const todayDate = new Date().toISOString().split('T')[0];
+    return data.tasks.filter(t => t.deadline && t.deadline < todayDate && t.status !== 'Deployed').length;
+  }, [data.tasks]);
 
   return (
     <motion.div

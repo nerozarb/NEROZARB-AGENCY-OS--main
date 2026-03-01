@@ -8,6 +8,32 @@ const isSupabaseConfigured = () => {
     return Boolean(url && key && url !== 'https://placeholder-project.supabase.co');
 };
 
+// Retry-once wrapper for transient Supabase failures
+async function withRetry<T>(fn: () => Promise<T>, label: string): Promise<T | null> {
+    try {
+        return await fn();
+    } catch (e) {
+        console.warn(`[Supabase] ${label} failed, retrying once...`, e);
+        try {
+            return await fn();
+        } catch (e2) {
+            console.error(`[Supabase] ${label} retry failed. Data saved locally.`, e2);
+            return null;
+        }
+    }
+}
+
+// Debounce map — prevents flooding Supabase with rapid sequential updates to the same entity
+const pendingSyncs = new Map<string, ReturnType<typeof setTimeout>>();
+function debouncedSync(key: string, fn: () => void, delayMs = 300) {
+    const existing = pendingSyncs.get(key);
+    if (existing) clearTimeout(existing);
+    pendingSyncs.set(key, setTimeout(() => {
+        pendingSyncs.delete(key);
+        fn();
+    }, delayMs));
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // DATA MAPPERS: Supabase snake_case → App camelCase
 // Supabase / PostgreSQL returns column names in snake_case.
@@ -204,15 +230,17 @@ export const fetchAppDataFromSupabase = async (): Promise<Partial<AppData> | nul
 
 export const syncClientToSupabase = async (client: Client, isNew: boolean = false) => {
     if (!isSupabaseConfigured()) return;
-    try {
-        if (isNew) {
-            await supabase.from('clients').insert([client]);
-        } else {
-            await supabase.from('clients').update(client).eq('id', client.id);
-        }
-    } catch (e) {
-        console.error('Failed to sync client to Supabase', e);
-    }
+    debouncedSync(`client-${client.id}`, () => {
+        withRetry(async () => {
+            if (isNew) {
+                const { error } = await supabase.from('clients').insert([client]);
+                if (error) throw error;
+            } else {
+                const { error } = await supabase.from('clients').update(client).eq('id', client.id);
+                if (error) throw error;
+            }
+        }, `sync client ${client.id}`);
+    });
 };
 
 export const deleteClientFromSupabase = async (id: number) => {
@@ -226,15 +254,17 @@ export const deleteClientFromSupabase = async (id: number) => {
 
 export const syncTaskToSupabase = async (task: Task, isNew: boolean = false) => {
     if (!isSupabaseConfigured()) return;
-    try {
-        if (isNew) {
-            await supabase.from('tasks').insert([task]);
-        } else {
-            await supabase.from('tasks').update(task).eq('id', task.id);
-        }
-    } catch (e) {
-        console.error('Failed to sync task to Supabase', e);
-    }
+    debouncedSync(`task-${task.id}`, () => {
+        withRetry(async () => {
+            if (isNew) {
+                const { error } = await supabase.from('tasks').insert([task]);
+                if (error) throw error;
+            } else {
+                const { error } = await supabase.from('tasks').update(task).eq('id', task.id);
+                if (error) throw error;
+            }
+        }, `sync task ${task.id}`);
+    });
 };
 
 export const syncTasksToSupabase = async (tasks: Task[]) => {
@@ -248,15 +278,17 @@ export const syncTasksToSupabase = async (tasks: Task[]) => {
 
 export const syncPostToSupabase = async (post: Post, isNew: boolean = false) => {
     if (!isSupabaseConfigured()) return;
-    try {
-        if (isNew) {
-            await supabase.from('posts').insert([post]);
-        } else {
-            await supabase.from('posts').update(post).eq('id', post.id);
-        }
-    } catch (e) {
-        console.error('Failed to sync post to Supabase', e);
-    }
+    debouncedSync(`post-${post.id}`, () => {
+        withRetry(async () => {
+            if (isNew) {
+                const { error } = await supabase.from('posts').insert([post]);
+                if (error) throw error;
+            } else {
+                const { error } = await supabase.from('posts').update(post).eq('id', post.id);
+                if (error) throw error;
+            }
+        }, `sync post ${post.id}`);
+    });
 };
 
 export const syncPostsToSupabase = async (posts: Post[]) => {
@@ -270,15 +302,17 @@ export const syncPostsToSupabase = async (posts: Post[]) => {
 
 export const syncProtocolToSupabase = async (protocol: Protocol, isNew: boolean = false) => {
     if (!isSupabaseConfigured()) return;
-    try {
-        if (isNew) {
-            await supabase.from('protocols').insert([protocol]);
-        } else {
-            await supabase.from('protocols').update(protocol).eq('id', protocol.id);
-        }
-    } catch (e) {
-        console.error('Failed to sync protocol to Supabase', e);
-    }
+    debouncedSync(`protocol-${protocol.id}`, () => {
+        withRetry(async () => {
+            if (isNew) {
+                const { error } = await supabase.from('protocols').insert([protocol]);
+                if (error) throw error;
+            } else {
+                const { error } = await supabase.from('protocols').update(protocol).eq('id', protocol.id);
+                if (error) throw error;
+            }
+        }, `sync protocol ${protocol.id}`);
+    });
 };
 
 export const deleteProtocolFromSupabase = async (id: number) => {

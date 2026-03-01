@@ -1,6 +1,11 @@
-import React, { createContext, useContext, ReactNode } from 'react';
+import React, { createContext, useContext, useCallback, useMemo, ReactNode } from 'react';
 import { AppData, Client, generateOnboardingProtocol, Task, Stage, ActivityEntry, Post, PostStage, Protocol, TimelineEvent } from '../utils/storage';
 import * as sync from '../utils/supabaseSync';
+
+// Safe max ID helper — uses reduce instead of Math.max(...spread) to avoid stack overflow on large arrays
+function safeMaxId<T extends { id: number }>(items: T[]): number {
+    return items.reduce((max, item) => Math.max(max, item.id), 0);
+}
 
 interface AppDataContextType {
     data: AppData;
@@ -44,7 +49,7 @@ export function AppDataProvider({
     };
 
     const addClient = (client: Omit<Client, 'id' | 'createdAt' | 'updatedAt'>) => {
-        const newId = Math.max(...data.clients.map(c => c.id), 0) + 1;
+        const newId = safeMaxId(data.clients) + 1;
         const now = new Date().toISOString();
         const newClient: Client = {
             ...client,
@@ -90,17 +95,17 @@ export function AppDataProvider({
                     if (!hasProtocol) {
                         nextOnboardings.push(generateOnboardingProtocol(id));
                     }
-                    timelineEvent = { id: Math.max(...newClient.timeline.map(e => e.id), 0) + 1, date: nowDate, event: `Sprint activated on ${nowDate}`, type: 'system' };
+                    timelineEvent = { id: safeMaxId(newClient.timeline) + 1, date: nowDate, event: `Sprint activated on ${nowDate}`, type: 'system' };
                 } else if (updates.status === 'Retainer') {
-                    timelineEvent = { id: Math.max(...newClient.timeline.map(e => e.id), 0) + 1, date: nowDate, event: `Converted to Tier 3 retainer on ${nowDate}`, type: 'system' };
+                    timelineEvent = { id: safeMaxId(newClient.timeline) + 1, date: nowDate, event: `Converted to Tier 3 retainer on ${nowDate}`, type: 'system' };
                     // Archive active tasks
                     nextTasks.forEach(t => { if (t.clientId === id && t.status === 'active') t.status = 'deployed'; });
                 } else if (updates.status === 'Closed') {
-                    timelineEvent = { id: Math.max(...newClient.timeline.map(e => e.id), 0) + 1, date: nowDate, event: `Account closed on ${nowDate}`, type: 'system' };
+                    timelineEvent = { id: safeMaxId(newClient.timeline) + 1, date: nowDate, event: `Account closed on ${nowDate}`, type: 'system' };
                     // Archive active tasks
                     nextTasks.forEach(t => { if (t.clientId === id && t.status === 'active') t.status = 'cancelled'; });
                 } else if (updates.status === 'Discovery') {
-                    timelineEvent = { id: Math.max(...newClient.timeline.map(e => e.id), 0) + 1, date: nowDate, event: `Discovery phase started on ${nowDate}`, type: 'system' };
+                    timelineEvent = { id: safeMaxId(newClient.timeline) + 1, date: nowDate, event: `Discovery phase started on ${nowDate}`, type: 'system' };
                 }
             }
 
@@ -138,7 +143,7 @@ export function AppDataProvider({
             clients: prev.clients.map(c => {
                 if (c.id !== clientId) return c;
                 const newEvent: TimelineEvent = {
-                    id: Math.max(0, ...c.timeline.map(e => e.id)) + 1,
+                    id: safeMaxId(c.timeline) + 1,
                     date: new Date().toISOString().split('T')[0],
                     event,
                     type
@@ -172,7 +177,7 @@ export function AppDataProvider({
                     if (clientIndex !== -1 && step) {
                         const client = nextClients[clientIndex];
                         const events: TimelineEvent[] = [{
-                            id: Math.max(0, ...client.timeline.map(e => e.id)) + 1,
+                            id: safeMaxId(client.timeline) + 1,
                             date: nowDate,
                             event: `Onboarding Step ${stepId} completed: ${step.label} on ${nowDate}`,
                             type: 'system'
@@ -180,7 +185,7 @@ export function AppDataProvider({
 
                         if (progress === 10) {
                             events.push({
-                                id: Math.max(0, ...client.timeline.map(e => e.id)) + 2,
+                                id: safeMaxId(client.timeline) + 2,
                                 date: nowDate,
                                 event: `Onboarding complete — Sprint officially live: ${nowDate}`,
                                 type: 'system'
@@ -204,7 +209,7 @@ export function AppDataProvider({
     };
 
     const addTask = (task: Omit<Task, 'id' | 'createdAt' | 'updatedAt' | 'activityLog'>) => {
-        const newId = Math.max(...data.tasks.map(t => t.id), 0) + 1;
+        const newId = safeMaxId(data.tasks) + 1;
         const now = new Date().toISOString();
 
         // Phase 6 Trigger Group 5: Auto-suggest SOP from Vault
@@ -273,7 +278,7 @@ export function AppDataProvider({
                     if (clientIndex !== -1) {
                         const client = nextClients[clientIndex];
                         const timelineEvent: TimelineEvent = {
-                            id: Math.max(0, ...client.timeline.map(e => e.id)) + 1,
+                            id: safeMaxId(client.timeline) + 1,
                             date: now.split('T')[0],
                             event: `Task '${t.name}' deployed on ${now.split('T')[0]}`,
                             type: 'system'
@@ -326,7 +331,7 @@ export function AppDataProvider({
         ];
 
         setData(prev => {
-            let nextId = Math.max(...prev.tasks.map(t => t.id), 0) + 1;
+            let nextId = safeMaxId(prev.tasks) + 1;
             const newTasks = standardTasks.map(task => {
                 const id = nextId++;
                 const nowIso = new Date().toISOString();
@@ -354,7 +359,7 @@ export function AppDataProvider({
     };
 
     const addPost = (post: Omit<Post, 'id' | 'createdAt' | 'updatedAt' | 'activityLog'>) => {
-        const newId = Math.max(...data.posts.map(p => p.id), 0) + 1;
+        const newId = safeMaxId(data.posts) + 1;
         const now = new Date().toISOString();
         const newPost: Post = {
             ...post,
@@ -395,7 +400,7 @@ export function AppDataProvider({
                         const clientIndex = nextClients.findIndex(c => c.id === p.clientId);
 
                         nextProtocols.push({
-                            id: Math.max(0, ...nextProtocols.map(pr => pr.id)) + 1,
+                            id: safeMaxId(nextProtocols) + 1,
                             title: `Top Performer: ${updatedPost.hook}`,
                             category: 'client-knowledge-base',
                             pillar: updatedPost.contentPillar as any,
@@ -419,7 +424,7 @@ export function AppDataProvider({
                             nextClients[clientIndex] = {
                                 ...nextClients[clientIndex],
                                 timeline: [{
-                                    id: Math.max(0, ...nextClients[clientIndex].timeline.map(e => e.id)) + 1,
+                                    id: safeMaxId(nextClients[clientIndex].timeline) + 1,
                                     date: nowIso.split('T')[0],
                                     event: `Top performer: ${updatedPost.hook} — ${(sr * 100).toFixed(1)}% save rate`,
                                     type: 'system'
@@ -461,7 +466,7 @@ export function AppDataProvider({
                     if (clientIndex !== -1) {
                         const client = nextClients[clientIndex];
                         const timelineEvent: TimelineEvent = {
-                            id: Math.max(0, ...client.timeline.map(e => e.id)) + 1,
+                            id: safeMaxId(client.timeline) + 1,
                             date: now.split('T')[0],
                             event: `Post '${p.hook}' published on ${p.platforms.join(', ')} on ${now.split('T')[0]}`,
                             type: 'system'
@@ -497,7 +502,7 @@ export function AppDataProvider({
         if (!client) return;
 
         setData(prev => {
-            let nextId = Math.max(...prev.posts.map(p => p.id), 0) + 1;
+            let nextId = safeMaxId(prev.posts) + 1;
             const newPosts: Post[] = [];
             const nowIso = new Date().toISOString();
 
@@ -548,7 +553,7 @@ export function AppDataProvider({
     };
 
     const addProtocol = (protocol: Omit<Protocol, 'id' | 'createdAt' | 'updatedAt' | 'copyCount'>) => {
-        const newId = Math.max(...data.protocols.map(p => p.id), 0) + 1;
+        const newId = safeMaxId(data.protocols) + 1;
         const now = new Date().toISOString();
         const newProtocol: Protocol = {
             ...protocol,
@@ -597,8 +602,16 @@ export function AppDataProvider({
         });
     };
 
+    // Memoize context value — prevents creating a new object reference on every render
+    const contextValue = useMemo(() => ({
+        data, setData, updateData, addClient, updateClient, deleteClient, addTimelineEvent,
+        updateOnboardingStep, addTask, updateTask, advanceTaskStage, generateSprintTasks,
+        addPost, updatePost, advancePostStage, generateMonthlyPosts, addProtocol, updateProtocol,
+        deleteProtocol, recordPromptUsage
+    }), [data, setData]);
+
     return (
-        <AppDataContext.Provider value={{ data, setData, updateData, addClient, updateClient, deleteClient, addTimelineEvent, updateOnboardingStep, addTask, updateTask, advanceTaskStage, generateSprintTasks, addPost, updatePost, advancePostStage, generateMonthlyPosts, addProtocol, updateProtocol, deleteProtocol, recordPromptUsage }}>
+        <AppDataContext.Provider value={contextValue}>
             {children}
         </AppDataContext.Provider>
     );

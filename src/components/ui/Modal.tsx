@@ -1,6 +1,18 @@
-import { ReactNode } from 'react';
+import { ReactNode, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, ArrowLeft } from 'lucide-react';
+
+// Escape key hook — dismiss modal on Escape press
+function useEscapeKey(isOpen: boolean, onClose: () => void) {
+  useEffect(() => {
+    if (!isOpen) return;
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    document.addEventListener('keydown', handler);
+    return () => document.removeEventListener('keydown', handler);
+  }, [isOpen, onClose]);
+}
 
 interface ModalProps {
   isOpen: boolean;
@@ -11,6 +23,8 @@ interface ModalProps {
 }
 
 export function Modal({ isOpen, onClose, title, width = 500, children }: ModalProps) {
+  useEscapeKey(isOpen, onClose);
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -46,7 +60,7 @@ export function Modal({ isOpen, onClose, title, width = 500, children }: ModalPr
               </button>
               <h2 className="font-heading text-lg tracking-tighter text-text-primary capitalize flex-1">{title}</h2>
             </div>
-            <div className="p-5 overflow-y-auto custom-scrollbar scroll-touch flex-1">
+            <div className="p-5 overflow-y-auto custom-scrollbar scroll-touch flex-1 min-h-0">
               {children}
             </div>
           </motion.div>
@@ -69,7 +83,7 @@ export function Modal({ isOpen, onClose, title, width = 500, children }: ModalPr
                 <X size={20} />
               </button>
             </div>
-            <div className="p-6 overflow-y-auto custom-scrollbar">
+            <div className="p-6 overflow-y-auto custom-scrollbar min-h-0">
               {children}
             </div>
           </motion.div>

@@ -1,16 +1,27 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import LoginView from './views/Auth/LoginView';
 import SetupView from './views/Auth/SetupView';
 import AppShell from './components/layout/AppShell';
-import DashboardView from './views/CommandCenter/DashboardView';
-import ClientOS from './views/ClientOS';
-import FulfillmentOS from './views/FulfillmentOS';
-import ContentOS from './views/ContentOS';
-import KnowledgeVault from './views/KnowledgeVault';
-import OnboardingOS from './views/OnboardingOS';
 import { loadData, saveData, AppData } from './utils/storage';
 import { AppDataProvider } from './contexts/AppDataContext';
 import { fetchAppDataFromSupabase, syncSettingsToSupabase } from './utils/supabaseSync';
+
+// Lazy-loaded view modules — only loaded when user navigates to them
+const DashboardView = lazy(() => import('./views/CommandCenter/DashboardView'));
+const ClientOS = lazy(() => import('./views/ClientOS'));
+const FulfillmentOS = lazy(() => import('./views/FulfillmentOS'));
+const ContentOS = lazy(() => import('./views/ContentOS'));
+const KnowledgeVault = lazy(() => import('./views/KnowledgeVault'));
+const OnboardingOS = lazy(() => import('./views/OnboardingOS'));
+
+// Suspense fallback for lazy-loaded views
+function ViewLoader() {
+  return (
+    <div className="flex-1 flex items-center justify-center">
+      <div className="text-text-muted text-sm font-mono animate-pulse tracking-wider">LOADING MODULE...</div>
+    </div>
+  );
+}
 
 export default function App() {
   const [data, setData] = useState<AppData>(loadData());
@@ -36,10 +47,11 @@ export default function App() {
     hydrate();
   }, []);
 
+  // Debounced save — prevents serializing entire state on every keystroke/click
   useEffect(() => {
-    if (data.settings.initialized && !isLoading) {
-      saveData(data);
-    }
+    if (!data.settings.initialized || isLoading) return;
+    const timeout = setTimeout(() => saveData(data), 500);
+    return () => clearTimeout(timeout);
   }, [data, isLoading]);
 
   const handleInitialize = (ceoHash: string, teamHash: string) => {
@@ -132,32 +144,34 @@ export default function App() {
         authLevel={authLevel}
         onLogout={handleLogout}
       >
-        {activeView === 'command' && authLevel === 'ceo' && <DashboardView onNavigate={(view, id) => {
-          setActiveView(view);
-          if (id) setSelectedGlobalClient(id);
-        }} />}
-        {activeView === 'client' && <ClientOS onNavigate={(view, id) => {
-          setActiveView(view);
-          if (id) setSelectedGlobalClient(id);
-        }} />}
-        {activeView === 'fulfillment' && <FulfillmentOS onNavigate={(view, id) => {
-          setActiveView(view);
-          if (id) setSelectedGlobalClient(id);
-        }} />}
-        {activeView === 'content' && <ContentOS onNavigate={(view, id) => {
-          setActiveView(view);
-          if (id) setSelectedGlobalClient(id);
-        }} />}
-        {activeView === 'vault' && <KnowledgeVault selectedClient={selectedGlobalClient} />}
-        {activeView === 'onboarding' && <OnboardingOS onNavigate={(view, id) => {
-          setActiveView(view);
-          if (id) setSelectedGlobalClient(id);
-        }} />}
-        {/* Fallback if team tries to access command center */}
-        {activeView === 'command' && authLevel !== 'ceo' && <FulfillmentOS onNavigate={(view, id) => {
-          setActiveView(view);
-          if (id) setSelectedGlobalClient(id);
-        }} />}
+        <Suspense fallback={<ViewLoader />}>
+          {activeView === 'command' && authLevel === 'ceo' && <DashboardView onNavigate={(view, id) => {
+            setActiveView(view);
+            if (id) setSelectedGlobalClient(id);
+          }} />}
+          {activeView === 'client' && <ClientOS onNavigate={(view, id) => {
+            setActiveView(view);
+            if (id) setSelectedGlobalClient(id);
+          }} />}
+          {activeView === 'fulfillment' && <FulfillmentOS onNavigate={(view, id) => {
+            setActiveView(view);
+            if (id) setSelectedGlobalClient(id);
+          }} />}
+          {activeView === 'content' && <ContentOS onNavigate={(view, id) => {
+            setActiveView(view);
+            if (id) setSelectedGlobalClient(id);
+          }} />}
+          {activeView === 'vault' && <KnowledgeVault selectedClient={selectedGlobalClient} />}
+          {activeView === 'onboarding' && <OnboardingOS onNavigate={(view, id) => {
+            setActiveView(view);
+            if (id) setSelectedGlobalClient(id);
+          }} />}
+          {/* Fallback if team tries to access command center */}
+          {activeView === 'command' && authLevel !== 'ceo' && <FulfillmentOS onNavigate={(view, id) => {
+            setActiveView(view);
+            if (id) setSelectedGlobalClient(id);
+          }} />}
+        </Suspense>
       </AppShell>
     </AppDataProvider>
   );

@@ -86,7 +86,7 @@ export default function RevenueGateModal({ isOpen, onClose, onClientCreated }: R
                     className="w-full max-w-2xl bg-surface  shadow-2xl flex flex-col max-h-[90vh] relative z-10"
                 >
                     {/* Header */}
-                    <div className="flex items-center justify-between p-6 border-b border-border-dark">
+                    <div className="flex items-center justify-between p-6 border-b border-border-dark shrink-0">
                         <div>
                             <h2 className="font-heading font-black text-xl text-text-primary tracking-tight">INSTALL NEW CLIENT</h2>
                             <p className="text-text-muted text-sm mt-1">Revenue Gate & Initial Profiling</p>
@@ -100,7 +100,7 @@ export default function RevenueGateModal({ isOpen, onClose, onClientCreated }: R
                     </div>
 
                     {/* Body */}
-                    <div className="p-6 overflow-y-auto custom-scrollbar flex-1">
+                    <div className="p-6 overflow-y-auto custom-scrollbar flex-1 min-h-0">
                         <form id="revenue-gate-form" onSubmit={handleSubmit} className="space-y-8">
 
                             {/* Basic Info */}
@@ -232,7 +232,7 @@ export default function RevenueGateModal({ isOpen, onClose, onClientCreated }: R
                     </div>
 
                     {/* Footer */}
-                    <div className="p-6 border-t border-border-dark flex justify-end gap-4 bg-surface-hover">
+                    <div className="p-6 border-t border-border-dark flex justify-end gap-4 bg-surface-hover shrink-0">
                         <Button variant="outline" onClick={onClose} className="h-12 px-6 border-border-dark hover:border-text-muted">
                             Cancel
                         </Button>
