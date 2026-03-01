@@ -61,7 +61,7 @@ export default function ContentOS({ onNavigate }: { onNavigate?: (view: string, 
       initial="hidden"
       animate="show"
       variants={containerVariants}
-      className="p-4 md:p-8 w-full max-w-[1800px] mx-auto space-y-4 md:space-y-8 h-[100svh] flex flex-col"
+      className="p-4 md:p-8 w-full max-w-[1800px] mx-auto space-y-4 md:space-y-8 min-h-full flex flex-col"
     >
       <motion.header variants={itemVariants} className="flex flex-col md:flex-row md:justify-between md:items-end gap-3 flex-shrink-0">
         <div>

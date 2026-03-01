@@ -65,7 +65,7 @@ export default function KnowledgeVault({ selectedClient }: { selectedClient?: st
     });
 
     return (
-        <div className="h-full flex flex-col bg-bg-main animate-fade-in relative z-0">
+        <div className="h-full flex flex-col animate-fade-in">
             {/* Header */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 md:p-6 border-b border-border-dark flex-shrink-0 gap-3">
                 <div>

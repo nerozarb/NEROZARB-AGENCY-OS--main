@@ -2,17 +2,18 @@
 @import "tailwindcss";
 
 @theme {
-  --color-onyx: #09090B;
-  --color-sidebar: #09090B;
-  --color-card: rgba(255, 255, 255, 0.02);
-  --color-card-alt: rgba(255, 255, 255, 0.05);
+  --color-onyx: #0C0F14;
+  --color-sidebar: #0A0D12;
+  --color-card: rgba(255, 255, 255, 0.04);
+  --color-card-alt: rgba(255, 255, 255, 0.07);
   --color-primary: #3F6A24;
   --color-accent-mid: #5A8A3A;
   --color-accent-light: #A8C69F;
-  --color-text-primary: #FFFFFF;
+  --color-text-primary: #F0F0F2;
   --color-text-secondary: #D4D4D8;
   --color-text-muted: #A1A1AA;
-  --color-border-dark: rgba(255, 255, 255, 0.05);
+  --color-border-dark: rgba(255, 255, 255, 0.08);
+  --color-surface: rgba(255, 255, 255, 0.03);
 
   --font-heading: "Montserrat", sans-serif;
   --font-mono: "Space Mono", monospace;
@@ -21,7 +22,9 @@
 
 body {
   background-color: var(--color-onyx);
-  background-image: radial-gradient(circle at 50% 0%, #161616 0%, transparent 70%);
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(63, 106, 36, 0.06) 0%, transparent 60%),
+    radial-gradient(circle at 50% 0%, #161a21 0%, transparent 70%);
   color: var(--color-text-primary);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
@@ -70,9 +73,34 @@ body {
   background: transparent;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: var(--color-border-dark);
+  background: rgba(255, 255, 255, 0.08);
   border-radius: 4px;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: var(--color-text-muted);
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* Page transitions */
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Drag-and-drop styles */
+.drag-over {
+  border-color: var(--color-primary) !important;
+  background-color: rgba(63, 106, 36, 0.08) !important;
+}
+.dragging {
+  opacity: 0.5;
+  transform: scale(0.98);
+}
+
+/* Select dropdown styling for dark theme */
+select option {
+  background-color: #141820;
+  color: var(--color-text-primary);
 }

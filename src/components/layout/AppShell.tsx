@@ -57,7 +57,7 @@ export default function AppShell({
         </header>
 
         {/* Dynamic View Content */}
-        <div className="flex-1 overflow-hidden relative">
+        <div className="flex-1 overflow-y-auto relative custom-scrollbar">
           {children}
         </div>
       </main>

@@ -30,7 +30,7 @@ export function Modal({ isOpen, onClose, title, width = 500, children }: ModalPr
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-            className="md:hidden fixed inset-x-0 bottom-0 z-50 bg-card border-t border-border-dark
+            className="md:hidden fixed inset-x-0 bottom-0 z-50 bg-[#141820] border-t border-border-dark
                        flex flex-col max-h-[92vh] rounded-t-[16px] overflow-hidden"
           >
             {/* Top accent */}
@@ -58,8 +58,8 @@ export function Modal({ isOpen, onClose, title, width = 500, children }: ModalPr
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ type: 'spring', stiffness: 300, damping: 25 }}
             className="hidden md:flex fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2
-                       bg-card/95 backdrop-blur-xl 
-                       shadow-[0_0_50px_rgba(0,0,0,0.5)] z-50 overflow-hidden flex-col max-h-[90vh] rounded-sm"
+                       bg-[#141820] border border-border-dark
+                       shadow-[0_0_60px_rgba(0,0,0,0.5)] z-50 overflow-hidden flex-col max-h-[90vh] rounded-sm"
             style={{ width: `${width}px`, maxWidth: '95vw' }}
           >
             <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-primary/50 via-primary to-primary/50" />

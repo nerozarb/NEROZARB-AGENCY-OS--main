@@ -58,7 +58,7 @@ export default function OnboardingOS({ onNavigate }: { onNavigate?: (view: strin
         <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="p-4 md:p-8 max-w-[1600px] mx-auto space-y-6 md:space-y-12 h-[100svh] flex flex-col"
+            className="p-4 md:p-8 max-w-[1600px] mx-auto space-y-6 md:space-y-12 min-h-full flex flex-col"
         >
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-baseline flex-shrink-0 gap-2">
