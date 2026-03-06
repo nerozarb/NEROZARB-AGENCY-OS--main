@@ -1,16 +1,18 @@
 import React from 'react';
 import { Protocol } from '../../utils/storage';
+import { Card } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
-import { Copy, Bot } from 'lucide-react';
+import { Copy, Bot, CopyPlus } from 'lucide-react';
 
 interface AiPromptCardProps {
     protocol: Protocol;
     onClick: () => void;
     onCopy: (e: React.MouseEvent) => void;
+    onDuplicate: (e: React.MouseEvent) => void;
     copiedState: boolean;
 }
 
-export const AiPromptCard: React.FC<AiPromptCardProps> = ({ protocol, onClick, onCopy, copiedState }) => {
+export const AiPromptCard: React.FC<AiPromptCardProps> = ({ protocol, onClick, onCopy, onDuplicate, copiedState }) => {
 
     // Tools indicator
     const renderToolIcon = () => {
@@ -25,9 +27,9 @@ export const AiPromptCard: React.FC<AiPromptCardProps> = ({ protocol, onClick, o
     }
 
     return (
-        <div
+        <Card
             onClick={onClick}
-            className="group relative bg-[#0A0A0A]  rounded-sm overflow-hidden hover:border-border-dark/80 hover:shadow-[0_8px_30px_rgba(0,0,0,0.12)] transition-all cursor-pointer flex flex-col h-full"
+            className="group relative bg-[#0A0A0A] transition-all cursor-pointer flex flex-col h-full overflow-hidden"
         >
             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary/20 via-primary/60 to-primary/20" />
 
@@ -67,11 +69,19 @@ export const AiPromptCard: React.FC<AiPromptCardProps> = ({ protocol, onClick, o
                         )}
                     </button>
 
+                    <button
+                        onClick={onDuplicate}
+                        title="Duplicate Prompt"
+                        className="p-2 text-text-secondary hover:text-primary hover:bg-white/5 transition-colors rounded-sm"
+                    >
+                        <CopyPlus className="w-4 h-4" />
+                    </button>
+
                     <button className="px-3 py-2 text-xs font-mono text-text-secondary  hover:bg-white/5 transition-colors rounded-sm uppercase tracking-widest">
                         View
                     </button>
                 </div>
             </div>
-        </div>
+        </Card>
     );
 }

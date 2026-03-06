@@ -210,14 +210,19 @@ export const fetchAppDataFromSupabase = async (): Promise<Partial<AppData> | nul
         if (protocolsRes.error) throw protocolsRes.error;
         if (onboardingsRes.error) throw onboardingsRes.error;
 
-        return {
+        const result: Partial<AppData> = {
             clients: (clientsRes.data ?? []).map(mapClient),
             tasks: (tasksRes.data ?? []).map(mapTask),
             posts: (postsRes.data ?? []).map(mapPost),
             protocols: (protocolsRes.data ?? []).map(mapProtocol),
             onboardings: (onboardingsRes.data ?? []).map(mapOnboarding),
-            settings: settingsRes.data ? mapSettings(settingsRes.data) : undefined,
         };
+
+        if (settingsRes.data) {
+            result.settings = mapSettings(settingsRes.data);
+        }
+
+        return result;
     } catch (e) {
         console.error('Failed to fetch from Supabase. Falling back to local storage.', e);
         return null;

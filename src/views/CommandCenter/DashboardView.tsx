@@ -1,9 +1,10 @@
-import { useMemo } from 'react';
+import { useMemo, memo } from 'react';
 import { motion } from 'motion/react';
 import { Card } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
 import { Activity, AlertTriangle, DollarSign, Target, ChevronRight } from 'lucide-react';
 import { useAppData } from '../../contexts/AppDataContext';
+import { formatCurrency } from '../../utils/formatCurrency';
 
 export default function DashboardView({ onNavigate }: { onNavigate?: (view: string, id?: string) => void }) {
   const { data } = useAppData();
@@ -22,25 +23,68 @@ export default function DashboardView({ onNavigate }: { onNavigate?: (view: stri
   };
 
   // KPI Calculations — memoized to avoid recomputation on unrelated re-renders
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(amount);
-  };
 
   const activeClients = useMemo(() =>
     data.clients.filter(c => c.status === 'Active Sprint' || c.status === 'Retainer'),
     [data.clients]
   );
+
   const cashCollected = useMemo(() =>
-    activeClients.reduce((sum, client) => sum + (client.ltv || 0), 0),
+    activeClients.reduce((sum, client) => sum + (client.contractValue || client.ltv || 0), 0),
     [activeClients]
   );
+
   const pipelineLeads = useMemo(() =>
     data.clients.filter(c => c.status === 'Lead' || c.status === 'Discovery').length,
     [data.clients]
   );
+
   const frictionAlerts = useMemo(() => {
-    const todayDate = new Date().toISOString().split('T')[0];
-    return data.tasks.filter(t => t.deadline && t.deadline < todayDate && t.status !== 'Deployed').length;
+    const now = new Date();
+    return data.tasks.filter(t =>
+      t.status !== 'Deployed' &&
+      t.status !== 'Completed' &&
+      t.deadline &&
+      new Date(t.deadline) < now
+    ).length;
+  }, [data.tasks]);
+
+  // Last synced: derive from most recently updated entity across all data collections
+  const lastSyncedAt = useMemo(() => {
+    const timestamps: string[] = [
+      ...data.clients.map(c => c.updatedAt),
+      ...data.tasks.map(t => t.updatedAt),
+      ...data.posts.map(p => p.updatedAt),
+      ...data.protocols.map(p => p.updatedAt),
+    ].filter(Boolean);
+    if (timestamps.length === 0) return null;
+    return new Date(Math.max(...timestamps.map(t => new Date(t).getTime())));
+  }, [data.clients, data.tasks, data.posts, data.protocols]);
+
+  const formatSyncTime = (date: Date | null) => {
+    if (!date) return 'Never';
+    const diff = Math.floor((Date.now() - date.getTime()) / 1000);
+    if (diff < 60) return `${diff}s ago`;
+    if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+    if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+    return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+  };
+
+  const liveOperations = useMemo(() => {
+    return data.tasks
+      .filter(t => t.status !== 'Deployed' && t.status !== 'Completed')
+      .sort((a, b) => {
+        // Sort by priority first, then deadline
+        const priorityOrder: Record<string, number> = { 'high': 0, 'medium': 1, 'low': 2 };
+        const pA = priorityOrder[a.priority as string] ?? 1;
+        const pB = priorityOrder[b.priority as string] ?? 1;
+        if (pA !== pB) return pA - pB;
+
+        if (!a.deadline) return 1;
+        if (!b.deadline) return -1;
+        return new Date(a.deadline).getTime() - new Date(b.deadline).getTime();
+      })
+      .slice(0, 5);
   }, [data.tasks]);
 
   return (
@@ -76,9 +120,21 @@ export default function DashboardView({ onNavigate }: { onNavigate?: (view: stri
           <h3 className="font-mono text-[11px] tracking-widest text-text-muted uppercase mb-4">Tier Distribution</h3>
           <Card className="p-5">
             <div className="space-y-4">
-              <DistributionRow label="Tier 1 (Enterprise)" value="0" percentage={0} />
-              <DistributionRow label="Tier 2 (Growth)" value={data.clients.filter(c => c.tier?.includes('Tier 2')).length} percentage={100} />
-              <DistributionRow label="Tier 3 (Incubator)" value="0" percentage={0} />
+              <DistributionRow
+                label="Tier 1 (Enterprise)"
+                value={data.clients.filter(c => c.tier?.includes('1')).length}
+                percentage={data.clients.length ? (data.clients.filter(c => c.tier?.includes('1')).length / data.clients.length) * 100 : 0}
+              />
+              <DistributionRow
+                label="Tier 2 (Growth)"
+                value={data.clients.filter(c => c.tier?.includes('2')).length}
+                percentage={data.clients.length ? (data.clients.filter(c => c.tier?.includes('2')).length / data.clients.length) * 100 : 0}
+              />
+              <DistributionRow
+                label="Tier 3 (Incubator)"
+                value={data.clients.filter(c => c.tier?.includes('3')).length}
+                percentage={data.clients.length ? (data.clients.filter(c => c.tier?.includes('3')).length / data.clients.length) * 100 : 0}
+              />
             </div>
           </Card>
         </div>
@@ -87,7 +143,7 @@ export default function DashboardView({ onNavigate }: { onNavigate?: (view: stri
           <h3 className="font-mono text-[11px] tracking-widest text-text-muted uppercase mb-4">Live Operations</h3>
           <Card className="p-0">
             <div className="divide-y divide-border-dark">
-              {data.tasks.slice(0, 4).map((task, idx) => {
+              {liveOperations.map((task, idx) => {
                 const client = data.clients.find(c => c.id === task.clientId);
                 return (
                   <OperationRow
@@ -95,7 +151,7 @@ export default function DashboardView({ onNavigate }: { onNavigate?: (view: stri
                     client={client?.name || 'Unknown'}
                     task={task.name}
                     status={task.status}
-                    time="Active"
+                    time={task.deadline ? new Date(task.deadline).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : "Active"}
                     onClick={() => onNavigate?.('fulfillment', client?.id.toString())}
                   />
                 );
@@ -123,15 +179,24 @@ export default function DashboardView({ onNavigate }: { onNavigate?: (view: stri
                 </tr>
               </thead>
               <tbody className="divide-y divide-border-dark">
-                {activeClients.map((client, idx) => (
-                  <HealthRow
-                    key={idx}
-                    client={client.name}
-                    health={client.relationshipHealth || 'healthy'}
-                    touch="Recent"
-                    onClick={() => onNavigate?.('client', client.id.toString())}
-                  />
-                ))}
+                {activeClients.map((client, idx) => {
+                  const clientTasks = data.tasks.filter(t => t.clientId === client.id);
+                  const lastDate = clientTasks.length > 0
+                    ? new Date(Math.max(...clientTasks.map(t => new Date(t.updatedAt).getTime())))
+                    : new Date(client.updatedAt);
+                  const days = Math.floor((Date.now() - lastDate.getTime()) / 86400000);
+                  const touch = days === 0 ? 'Today' : days === 1 ? '1 day ago' : `${days} days ago`;
+
+                  return (
+                    <HealthRow
+                      key={client.id}
+                      client={client.name}
+                      health={client.relationshipHealth || 'healthy'}
+                      touch={touch}
+                      onClick={() => onNavigate?.('client', client.id.toString())}
+                    />
+                  );
+                })}
                 {activeClients.length === 0 && (
                   <tr><td colSpan={4} className="p-4 text-center text-sm text-text-muted font-mono">No active clients.</td></tr>
                 )}
@@ -164,18 +229,24 @@ export default function DashboardView({ onNavigate }: { onNavigate?: (view: stri
           <div>
             <p className="font-mono text-[9px] text-text-muted tracking-widest uppercase mb-1">Database Integrity</p>
             <p className="font-sans text-xs text-primary font-medium flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-primary" />
-              100% SECURE
+              <span className={`w-1.5 h-1.5 rounded-full ${import.meta.env.VITE_SUPABASE_URL ? 'bg-primary animate-pulse' : 'bg-yellow-500'}`} />
+              {import.meta.env.VITE_SUPABASE_URL ? 'SUPABASE CLOUD SECURE' : 'LOCAL STORAGE MODE'}
             </p>
           </div>
           <div>
-            <p className="font-mono text-[9px] text-text-muted tracking-widest uppercase mb-1">Last Data Sync</p>
-            <p className="font-sans text-xs text-text-secondary font-medium">Auto-Saving...</p>
+            <p className="font-mono text-[9px] text-text-muted tracking-widest uppercase mb-1">Last Synced</p>
+            <p className="font-sans text-xs text-text-secondary font-medium">{formatSyncTime(lastSyncedAt)}</p>
+          </div>
+          <div>
+            <p className="font-mono text-[9px] text-text-muted tracking-widest uppercase mb-1">Status</p>
+            <p className="font-sans text-xs text-text-secondary font-medium">System Nominal</p>
           </div>
         </div>
         <div className="text-right">
-          <p className="font-mono text-[9px] text-text-muted tracking-widest uppercase mb-1">Access Level</p>
-          <p className="font-sans text-xs text-accent-light font-medium tracking-wide uppercase">CEO FOUNDER</p>
+          <p className="font-mono text-[9px] text-text-muted tracking-widest uppercase mb-1">Auth Profile</p>
+          <p className="font-sans text-xs text-accent-light font-medium tracking-wide uppercase">
+            {sessionStorage.getItem('authLevel')?.toUpperCase() || 'TEAM MEMBER'}
+          </p>
         </div>
       </motion.div>
 
@@ -183,9 +254,9 @@ export default function DashboardView({ onNavigate }: { onNavigate?: (view: stri
   );
 }
 
-// Sub-components for Dashboard
+// Sub-components for Dashboard — wrapped in React.memo to prevent re-renders
 
-function KpiCard({ title, value, icon: Icon, trend, alert = false, onClick }: any) {
+const KpiCard = memo(function KpiCard({ title, value, icon: Icon, trend, alert = false, onClick }: any) {
   return (
     <Card accentTop className={`p-4 md:p-5 group ${onClick ? 'cursor-pointer hover:bg-card-alt transition-colors active:scale-[0.98]' : 'cursor-default'}`} onClick={onClick}>
       <div className="flex justify-between items-start mb-4">
@@ -196,9 +267,9 @@ function KpiCard({ title, value, icon: Icon, trend, alert = false, onClick }: an
       <Badge status={alert ? 'critical' : 'healthy'}>{trend}</Badge>
     </Card>
   );
-}
+});
 
-function DistributionRow({ label, value, percentage }: any) {
+const DistributionRow = memo(function DistributionRow({ label, value, percentage }: any) {
   return (
     <div className="group">
       <div className="flex justify-between text-sm mb-2">
@@ -215,9 +286,9 @@ function DistributionRow({ label, value, percentage }: any) {
       </div>
     </div>
   );
-}
+});
 
-function OperationRow({ client, task, status, time, onClick }: any) {
+const OperationRow = memo(function OperationRow({ client, task, status, time, onClick }: any) {
   return (
     <div
       className="p-4 flex items-center justify-between hover:bg-card-alt transition-colors cursor-pointer group"
@@ -237,9 +308,9 @@ function OperationRow({ client, task, status, time, onClick }: any) {
       </div>
     </div>
   );
-}
+});
 
-function HealthRow({ client, health, touch, onClick }: any) {
+const HealthRow = memo(function HealthRow({ client, health, touch, onClick }: any) {
   const healthColors = {
     'healthy': 'bg-primary',
     'at-risk': 'bg-yellow-500',
@@ -261,4 +332,4 @@ function HealthRow({ client, health, touch, onClick }: any) {
       </td>
     </tr>
   );
-}
+});

@@ -1,7 +1,7 @@
 import React, { InputHTMLAttributes, TextareaHTMLAttributes } from 'react';
 
 export type InputProps = InputHTMLAttributes<HTMLInputElement> & {
-  label: string;
+  label?: string;
   className?: string;
 };
 

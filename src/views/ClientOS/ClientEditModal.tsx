@@ -30,6 +30,14 @@ export default function ClientEditModal({ isOpen, onClose, client }: ClientEditM
     });
 
     useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape' && isOpen) onClose();
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [isOpen, onClose]);
+
+    useEffect(() => {
         setFormData({
             name: client.name,
             contactName: client.contactName,

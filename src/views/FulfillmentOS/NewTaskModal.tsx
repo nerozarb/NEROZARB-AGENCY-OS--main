@@ -183,7 +183,7 @@ export default function NewTaskModal({ isOpen, onClose }: NewTaskModalProps) {
             <textarea
               value={brief}
               onChange={e => setBrief(e.target.value)}
-              className="w-full bg-card-alt  text-text-primary px-4 py-3 text-sm focus:outline-none focus:border-primary transition-colors hover:border-text-muted rounded-none"
+              className="w-full bg-card-alt  text-text-primary px-4 py-3 text-sm focus:outline-none focus:border-primary transition-colors hover:border-text-muted rounded-sm"
               rows={3}
               placeholder="Describe the objective and deliverables..."
             />

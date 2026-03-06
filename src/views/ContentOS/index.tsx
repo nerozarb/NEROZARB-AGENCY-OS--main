@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import { Button } from '../../components/ui/Button';
-import { Calendar as CalendarIcon, KanbanSquare, CalendarDays, List, Plus, ClipboardList } from 'lucide-react';
+import { Calendar as CalendarIcon, KanbanSquare, CalendarDays, List, Plus, ClipboardList, X } from 'lucide-react';
 import { useAppData } from '../../contexts/AppDataContext';
 import { Post } from '../../utils/storage';
 import MonthlyView from './MonthlyView';
@@ -31,9 +31,24 @@ export default function ContentOS({ onNavigate }: { onNavigate?: (view: string, 
 
   // Separate states for new post modal and detail modal
   const [isNewPostModalOpen, setIsNewPostModalOpen] = useState(false);
-  const [isPlannerModalOpen, setIsPlannerModalOpen] = useState(false);
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [prefilledDate, setPrefilledDate] = useState<string | null>(null);
+
+  // Plan Month modal state
+  const [isPlannerOpen, setIsPlannerOpen] = useState(false);
+  const [plannerClientId, setPlannerClientId] = useState<number | null>(null);
+  const [isClientPickerOpen, setIsClientPickerOpen] = useState(false);
+
+  const handleOpenPlanner = () => {
+    if (clientFilter !== 'all') {
+      // A specific client is selected — open planner directly
+      setPlannerClientId(Number(clientFilter));
+      setIsPlannerOpen(true);
+    } else {
+      // Show client picker first
+      setIsClientPickerOpen(true);
+    }
+  };
 
   // Open new post form, optionally with a pre-filled date
   const handleOpenNewPost = (date: string | null = null) => {
@@ -84,13 +99,6 @@ export default function ContentOS({ onNavigate }: { onNavigate?: (view: string, 
             </select>
           </div>
 
-          {clientFilter !== 'all' && (
-            <Button variant="ghost" size="sm" onClick={() => setIsPlannerModalOpen(true)} className="whitespace-nowrap">
-              <ClipboardList size={14} />
-              <span className="hidden sm:inline">PLAN MONTH</span>
-              <span className="sm:hidden">PLAN</span>
-            </Button>
-          )}
 
           {/* View Toggles */}
           <div className="flex bg-card  rounded-sm p-1">
@@ -124,6 +132,11 @@ export default function ContentOS({ onNavigate }: { onNavigate?: (view: string, 
             </button>
           </div>
 
+          <Button size="sm" variant="outline" onClick={handleOpenPlanner} className="whitespace-nowrap">
+            <ClipboardList size={14} />
+            <span className="hidden sm:inline">PLAN MONTH</span>
+            <span className="sm:hidden">PLAN</span>
+          </Button>
           <Button size="sm" onClick={() => handleOpenNewPost()} className="whitespace-nowrap">
             <Plus size={14} />
             <span className="hidden sm:inline">NEW POST</span>
@@ -173,11 +186,65 @@ export default function ContentOS({ onNavigate }: { onNavigate?: (view: string, 
 
       {/* Monthly Planner Modal */}
       <MonthlyPlannerModal
-        isOpen={isPlannerModalOpen}
-        onClose={() => setIsPlannerModalOpen(false)}
-        clientId={clientFilter !== 'all' ? clientFilter : null}
+        isOpen={isPlannerOpen}
+        onClose={() => setIsPlannerOpen(false)}
+        clientId={plannerClientId}
         onNavigate={onNavigate}
       />
+
+      {/* Client Picker for Plan Month */}
+      <AnimatePresence>
+        {isClientPickerOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsClientPickerOpen(false)}
+              className="absolute inset-0 bg-background/80 backdrop-blur-sm"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="relative w-full max-w-sm bg-card border border-border-dark rounded-sm shadow-2xl overflow-hidden"
+            >
+              <div className="p-6 border-b border-border-dark flex justify-between items-center bg-card-alt">
+                <div>
+                  <h3 className="font-heading text-lg text-text-primary tracking-tight uppercase">Select Client</h3>
+                  <p className="font-mono text-[10px] text-text-muted mt-1 uppercase tracking-widest">Choose a client to plan this month for</p>
+                </div>
+                <button onClick={() => setIsClientPickerOpen(false)} className="p-2 text-text-muted hover:text-text-primary transition-colors">
+                  <X size={18} />
+                </button>
+              </div>
+              <div className="p-4 space-y-2 max-h-[60vh] overflow-y-auto custom-scrollbar">
+                {activeClients.length === 0 ? (
+                  <p className="font-mono text-[10px] text-text-muted text-center py-6 uppercase tracking-widest">No active clients found.</p>
+                ) : (
+                  activeClients.map(c => (
+                    <button
+                      key={c.id}
+                      onClick={() => {
+                        setPlannerClientId(c.id);
+                        setIsClientPickerOpen(false);
+                        setIsPlannerOpen(true);
+                      }}
+                      className="w-full flex items-center gap-3 p-4 bg-card-alt hover:bg-primary/10 hover:border-primary/50 border border-border-dark rounded-sm transition-all text-left group"
+                    >
+                      <div className="w-2 h-2 rounded-full bg-primary flex-shrink-0" />
+                      <div>
+                        <p className="font-heading text-sm text-text-primary uppercase group-hover:text-primary transition-colors">{c.name}</p>
+                        <p className="font-mono text-[10px] text-text-muted mt-0.5">{c.niche} · {c.tier}</p>
+                      </div>
+                    </button>
+                  ))
+                )}
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       {/* Post Detail Modal */}
       {selectedPost && (

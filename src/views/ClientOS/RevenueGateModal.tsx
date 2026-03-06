@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X } from 'lucide-react';
 import { Input } from '../../components/ui/Input';
@@ -14,6 +14,14 @@ interface RevenueGateModalProps {
 
 export default function RevenueGateModal({ isOpen, onClose, onClientCreated }: RevenueGateModalProps) {
     const { addClient } = useAppData();
+
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape' && isOpen) onClose();
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [isOpen, onClose]);
 
     const [formData, setFormData] = useState({
         name: '',

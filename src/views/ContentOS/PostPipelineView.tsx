@@ -87,7 +87,7 @@ export default function PostPipelineView({ posts, clients, onPostClick }: PostPi
                                                         <span className="text-primary/60">{client.name}</span>
                                                     )}
                                                 </div>
-                                                <div className="px-2 py-1 rounded bg-card-alt  text-[10px] font-mono text-text-primary uppercase tracking-wider">
+                                                <div className="px-2 py-1 rounded-sm bg-card-alt  text-[10px] font-mono text-text-primary uppercase tracking-wider">
                                                     {post.assignedTo}
                                                 </div>
                                             </div>

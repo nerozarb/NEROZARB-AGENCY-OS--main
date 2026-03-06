@@ -1,7 +1,8 @@
 import React from 'react';
 import { Protocol } from '../../utils/storage';
+import { Card } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
-import { MoreVertical } from 'lucide-react';
+import { MoreVertical, CopyPlus } from 'lucide-react';
 
 interface ProtocolCardProps {
     protocol: Protocol;
@@ -21,13 +22,21 @@ const pillarColors: Record<string, string> = {
     'Client Management': 'bg-sky-500'
 };
 
+const categoryBorderColors: Record<string, string> = {
+    'sop': 'border-l-blue-500',
+    'brand-standard': 'border-l-amber-500',
+    'client-knowledge-base': 'border-l-sky-400',
+    'ai-prompt': 'border-l-primary',
+};
+
 export const ProtocolCard: React.FC<ProtocolCardProps> = ({ protocol, onClick, onEdit, onDuplicate, onDelete }) => {
     const accentColor = pillarColors[protocol.pillar] || 'bg-primary';
+    const borderColor = categoryBorderColors[protocol.category] || 'border-l-zinc-600';
 
     return (
-        <div
+        <Card
             onClick={onClick}
-            className="group relative bg-card  rounded-sm overflow-hidden hover:border-border-dark/80 hover:shadow-[0_8px_30px_rgba(0,0,0,0.12)] transition-all cursor-pointer flex flex-col h-full"
+            className={`group relative transition-all cursor-pointer flex flex-col h-full overflow-hidden border-l-4 ${borderColor}`}
         >
             {/* Top Accent Bar */}
             <div className={`absolute top-0 left-0 right-0 h-1 ${accentColor}`} />
@@ -68,15 +77,27 @@ export const ProtocolCard: React.FC<ProtocolCardProps> = ({ protocol, onClick, o
             </div>
 
             {/* Actions Menu (simplified for now, full dropdown later) */}
-            <div
-                className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-white/5 rounded-sm"
-                onClick={(e) => {
-                    e.stopPropagation();
-                    // Open menu logic here
-                }}
-            >
-                <MoreVertical className="w-4 h-4 text-text-secondary" />
+            <div className="absolute top-3 right-3 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <button
+                    className="p-1 hover:bg-white/5 rounded-sm"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onDuplicate?.();
+                    }}
+                    title="Duplicate Protocol"
+                >
+                    <CopyPlus className="w-4 h-4 text-text-secondary hover:text-primary transition-colors" />
+                </button>
+                <div
+                    className="p-1 hover:bg-white/5 rounded-sm"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        // Open menu logic here
+                    }}
+                >
+                    <MoreVertical className="w-4 h-4 text-text-secondary" />
+                </div>
             </div>
-        </div>
+        </Card>
     );
 }

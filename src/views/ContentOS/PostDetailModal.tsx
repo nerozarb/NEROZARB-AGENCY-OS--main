@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, ExternalLink, Activity, ArrowRight, Clock, User, BarChart, Trash2, BrainCircuit } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
@@ -28,6 +28,14 @@ const CEO_GATED_STAGES: PostStage[] = ['CEO APPROVAL', 'CLIENT APPROVAL', 'SCHED
 
 export default function PostDetailModal({ isOpen, onClose, post, onNavigate }: PostDetailModalProps) {
   const { data, updatePost, advancePostStage } = useAppData();
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
 
   const client = useMemo(() => data.clients.find(c => c.id === post.clientId), [data.clients, post.clientId]);
   const linkedTask = useMemo(() => data.tasks.find(t => t.id === post.linkedTaskId), [data.tasks, post.linkedTaskId]);

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, Copy, TerminalSquare, AlertCircle, Edit2 } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
+import { Input } from '../../components/ui/Input';
 import { Protocol } from '../../utils/storage';
 import { useAppData } from '../../contexts/AppDataContext';
 
@@ -14,8 +15,17 @@ interface PromptDetailModalProps {
 
 export function PromptDetailModal({ isOpen, onClose, protocol, onEdit }: PromptDetailModalProps) {
     const { recordPromptUsage } = useAppData();
+
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape' && isOpen) onClose();
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [isOpen, onClose]);
     const [copied, setCopied] = useState(false);
     const [variables, setVariables] = useState<string[]>([]);
+    const [variableValues, setVariableValues] = useState<Record<string, string>>({});
 
     useEffect(() => {
         if (protocol && protocol.category === 'ai-prompt') {
@@ -23,15 +33,28 @@ export function PromptDetailModal({ isOpen, onClose, protocol, onEdit }: PromptD
             const matches = Array.from(protocol.content.matchAll(regex));
             const uniqueVars = Array.from(new Set(matches.map(m => m[1])));
             setVariables(uniqueVars);
+            setVariableValues(uniqueVars.reduce((acc, v) => ({ ...acc, [v]: '' }), {}));
         } else {
             setVariables([]);
+            setVariableValues({});
         }
         setCopied(false);
     }, [protocol]);
 
     const handleCopy = () => {
         if (!protocol) return;
-        navigator.clipboard.writeText(protocol.content);
+        let finalContent = protocol.content;
+
+        // Use a more robust replacement that handles special characters in variable names
+        Object.entries(variableValues).forEach(([key, val]) => {
+            if (val !== undefined && val !== null) {
+                // Escape key for regex
+                const escapedKey = key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                finalContent = finalContent.replace(new RegExp(`\\[\\[${escapedKey}\\]\\]`, 'g'), val.toString());
+            }
+        });
+
+        navigator.clipboard.writeText(finalContent);
         recordPromptUsage(protocol.id);
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
@@ -79,8 +102,8 @@ export function PromptDetailModal({ isOpen, onClose, protocol, onEdit }: PromptD
                                 onClick={handleCopy}
                                 disabled={copied}
                                 className={`flex items-center justify-center gap-2 py-2 px-6 text-xs font-mono uppercase tracking-widest transition-colors rounded-sm ${copied
-                                        ? 'bg-primary/20 text-primary border border-primary/50'
-                                        : 'bg-primary text-black hover:bg-primary-hover border border-primary'
+                                    ? 'bg-primary/20 text-primary border border-primary/50'
+                                    : 'bg-primary text-black hover:bg-primary-hover border border-primary'
                                     }`}
                             >
                                 {copied ? (<><span>[ COPIED ]</span></>) : (<><Copy className="w-4 h-4" /> <span>COPY PROMPT</span></>)}
@@ -99,7 +122,17 @@ export function PromptDetailModal({ isOpen, onClose, protocol, onEdit }: PromptD
                             <div className="space-y-4">
                                 <h3 className="font-mono text-[10px] uppercase tracking-widest text-text-secondary">Raw Prompt Request</h3>
                                 <pre className="font-mono text-sm text-text-primary whitespace-pre-wrap leading-relaxed bg-[#111] p-4 rounded-sm  select-all">
-                                    <code>{protocol.content}</code>
+                                    <code>
+                                        {Object.entries(variableValues).reduce((content, [key, val]) => {
+                                            if (val !== undefined && val !== null && val !== '') {
+                                                const escapedKey = key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                                                return content.replace(new RegExp(`\\[\\[${escapedKey}\\]\\]`, 'g'), `<span class="bg-primary/20 text-primary border-b border-primary/40 px-0.5 rounded-t-sm">${val}</span>`);
+                                            }
+                                            return content;
+                                        }, protocol.content).split('\n').map((line, i) => (
+                                            <div key={i} dangerouslySetInnerHTML={{ __html: line || '&nbsp;' }} />
+                                        ))}
+                                    </code>
                                 </pre>
                             </div>
                         </div>
@@ -119,8 +152,19 @@ export function PromptDetailModal({ isOpen, onClose, protocol, onEdit }: PromptD
                                                 The following dynamic variables were detected in this prompt. Replace them before executing.
                                             </p>
                                             {variables.map((v, i) => (
-                                                <div key={i} className="bg-bg-main  p-3 rounded-sm">
-                                                    <span className="font-mono text-xs text-primary font-bold">[[{v}]]</span>
+                                                <div key={i} className="bg-bg-main p-3 rounded-sm border border-border-dark space-y-2 group focus-within:border-primary transition-colors">
+                                                    <div className="flex justify-between items-center">
+                                                        <span className="font-mono text-[10px] text-primary font-bold uppercase tracking-tight">[[{v}]]</span>
+                                                        {variableValues[v] && (
+                                                            <span className="text-[10px] text-text-muted font-mono uppercase">Filled</span>
+                                                        )}
+                                                    </div>
+                                                    <input
+                                                        placeholder={`Enter value...`}
+                                                        value={variableValues[v] || ''}
+                                                        onChange={(e) => setVariableValues({ ...variableValues, [v]: e.target.value })}
+                                                        className="w-full bg-black/40 border-none outline-none text-xs p-2 rounded-sm text-text-primary placeholder:text-text-muted/50 font-mono focus:bg-black/60 transition-all"
+                                                    />
                                                 </div>
                                             ))}
                                         </div>

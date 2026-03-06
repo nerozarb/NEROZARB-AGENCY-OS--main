@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Card } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
-import { Search, ChevronRight, Activity, Clock, Users, Shield, Rocket, Plus } from 'lucide-react';
+import { Search, ChevronRight, Activity, Clock, Users, Shield, Rocket, Plus, AlertCircle } from 'lucide-react';
 import { useAppData } from '../../contexts/AppDataContext';
 import { OnboardingProtocol } from '../../utils/storage';
 import { formatDistanceToNow } from 'date-fns';
@@ -83,6 +83,25 @@ export default function OnboardingOS({ onNavigate }: { onNavigate?: (view: strin
 
             {/* Main Board */}
             <div className="flex-1 flex flex-col min-h-0 space-y-4">
+                {/* System Banner */}
+                <div className="bg-primary/5 border border-primary/20 p-4 rounded-sm flex items-center justify-between group">
+                    <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                            <AlertCircle size={20} className="text-primary" />
+                        </div>
+                        <div>
+                            <h5 className="text-xs font-mono font-bold text-text-primary uppercase tracking-widest">Protocol Generation Logic</h5>
+                            <p className="text-[10px] text-text-muted uppercase tracking-wider mt-0.5">
+                                protocols are exclusively generated for <span className="text-primary">active sprint</span> & <span className="text-primary">retainer</span> tiers. lead/discovery stages are excluded.
+                            </p>
+                        </div>
+                    </div>
+                    <div className="hidden lg:flex items-center gap-2">
+                        <div className="px-2 py-1 bg-background border border-border-dark font-mono text-[8px] text-text-muted rounded-sm">
+                            AUTO-SYNC: ENABLED
+                        </div>
+                    </div>
+                </div>
                 <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3 flex-shrink-0">
                     <div className="flex bg-card p-1  rounded-sm overflow-x-auto scroll-touch">
                         {['ALL', 'INCUBATOR', 'GROWTH', 'ENTERPRISE'].map(t => (

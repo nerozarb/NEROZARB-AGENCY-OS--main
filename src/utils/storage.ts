@@ -183,6 +183,7 @@ export interface Post {
     priority: 'normal' | 'high' | 'urgent';
     assignedTo: NodeRole;
     linkedTaskId: number | null;
+    linkedPromptId?: number | null;
 
     assetLinks: string[];
     referencePost: string | null;

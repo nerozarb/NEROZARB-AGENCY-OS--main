@@ -56,10 +56,19 @@ export default function NewPostModal({ isOpen, onClose, post, prefilledDate }: N
     // Section 4 & 5: Assignment & Assets
     const [assignedTo, setAssignedTo] = useState<NodeRole>('Art Director');
     const [linkedTaskId, setLinkedTaskId] = useState<number | ''>('');
+    const [linkedPromptId, setLinkedPromptId] = useState<number | ''>('');
     const [assetLinks, setAssetLinks] = useState('');
     const [referencePost, setReferencePost] = useState('');
 
     // Hydration effect
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape' && isOpen) onClose();
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [isOpen, onClose]);
+
     useEffect(() => {
         if (isOpen) {
             if (prefilledDate) {
@@ -117,9 +126,19 @@ export default function NewPostModal({ isOpen, onClose, post, prefilledDate }: N
             priority,
             assignedTo,
             linkedTaskId: linkedTaskId !== '' ? Number(linkedTaskId) : null,
+            linkedPromptId: linkedPromptId !== '' ? Number(linkedPromptId) : null,
             assetLinks: assetLinks ? assetLinks.split(',').map(s => s.trim()) : [],
             referencePost: referencePost || null,
             performance: null,
+            activityLog: [{
+                id: Date.now(),
+                userId: 1, // System/Current User
+                action: 'created',
+                timestamp: new Date().toISOString(),
+                details: 'Post created via Content Engine'
+            }],
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
         });
 
         onClose();
@@ -390,6 +409,19 @@ export default function NewPostModal({ isOpen, onClose, post, prefilledDate }: N
                                                 <option value="">None</option>
                                                 {data.tasks.filter(t => t.status === 'active').map(t => (
                                                     <option key={t.id} value={t.id}>{t.name}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-xs font-mono text-text-muted uppercase">Linked Prompt</label>
+                                            <select
+                                                value={linkedPromptId}
+                                                onChange={(e) => setLinkedPromptId(e.target.value === '' ? '' : Number(e.target.value))}
+                                                className="w-full bg-background  rounded-sm p-3 text-sm text-text-primary focus:border-primary outline-none"
+                                            >
+                                                <option value="">None</option>
+                                                {data.protocols.filter(p => p.category === 'ai-prompt').map(p => (
+                                                    <option key={p.id} value={p.id}>{p.title}</option>
                                                 ))}
                                             </select>
                                         </div>

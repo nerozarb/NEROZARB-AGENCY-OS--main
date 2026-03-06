@@ -8,7 +8,7 @@ interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
 export const Card: React.FC<CardProps> = ({ children, className = '', accentTop = false, ...props }) => {
   return (
     <div
-      className={`bg-card border border-border-dark rounded-sm relative overflow-hidden transition-all duration-200 hover:border-white/10 hover:shadow-[0_4px_24px_rgba(0,0,0,0.2)] ${className}`}
+      className={`bg-card border border-border-dark rounded-sm relative overflow-hidden transition-all duration-300 hover:border-primary/30 hover:shadow-[0_12px_40px_rgba(0,0,0,0.3),0_0_20px_rgba(63,106,36,0.1)] ${className}`}
       {...props}
     >
       {accentTop && <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-primary/50 via-primary to-primary/50" />}

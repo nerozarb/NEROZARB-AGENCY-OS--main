@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useCallback, useMemo, ReactNode } from 'react';
 import { AppData, Client, generateOnboardingProtocol, Task, Stage, ActivityEntry, Post, PostStage, Protocol, TimelineEvent } from '../utils/storage';
 import * as sync from '../utils/supabaseSync';
+import { Toast, ToastContainer } from '../components/ui/Toast';
 
 // Safe max ID helper — uses reduce instead of Math.max(...spread) to avoid stack overflow on large arrays
 function safeMaxId<T extends { id: number }>(items: T[]): number {
@@ -28,6 +29,8 @@ interface AppDataContextType {
     updateProtocol: (id: number, updates: Partial<Protocol>) => void;
     deleteProtocol: (id: number) => void;
     recordPromptUsage: (id: number) => void;
+    showToast: (message: string, type?: 'success' | 'error' | 'info') => void;
+    toasts: Toast[];
 }
 
 const AppDataContext = createContext<AppDataContextType | undefined>(undefined);
@@ -41,6 +44,21 @@ export function AppDataProvider({
     data: AppData;
     setData: React.Dispatch<React.SetStateAction<AppData>>;
 }) {
+    const [toasts, setToasts] = React.useState<Toast[]>([]);
+
+    const showToast = useCallback((message: string, type: 'success' | 'error' | 'info' = 'success') => {
+        const id = Math.random().toString(36).substring(2, 9);
+        const newToast: Toast = { id, message, type };
+        setToasts(prev => [...prev, newToast]);
+        setTimeout(() => {
+            setToasts(prev => prev.filter(t => t.id !== id));
+        }, 3000);
+    }, []);
+
+    const hideToast = useCallback((id: string) => {
+        setToasts(prev => prev.filter(t => t.id !== id));
+    }, []);
+
     const updateData = (newData: Partial<AppData>) => {
         setData(prev => {
             const updated = { ...prev, ...newData };
@@ -607,12 +625,13 @@ export function AppDataProvider({
         data, setData, updateData, addClient, updateClient, deleteClient, addTimelineEvent,
         updateOnboardingStep, addTask, updateTask, advanceTaskStage, generateSprintTasks,
         addPost, updatePost, advancePostStage, generateMonthlyPosts, addProtocol, updateProtocol,
-        deleteProtocol, recordPromptUsage
-    }), [data, setData]);
+        deleteProtocol, recordPromptUsage, showToast, toasts
+    }), [data, setData, showToast, toasts]);
 
     return (
         <AppDataContext.Provider value={contextValue}>
             {children}
+            <ToastContainer toasts={toasts} onClose={hideToast} />
         </AppDataContext.Provider>
     );
 }

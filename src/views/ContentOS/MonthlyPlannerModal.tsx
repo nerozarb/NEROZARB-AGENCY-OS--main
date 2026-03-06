@@ -36,6 +36,14 @@ export default function MonthlyPlannerModal({ isOpen, onClose, clientId, onNavig
 
     // Initialize with some blank rows when opened
     useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape' && isOpen) onClose();
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [isOpen, onClose]);
+
+    useEffect(() => {
         if (isOpen && rows.length === 0) {
             handleAddRow(3);
         }
