@@ -9,11 +9,11 @@ export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 
 export function Button({ children, variant = 'primary', size = 'md', className = '', ...props }: ButtonProps) {
   const variants: Record<string, string> = {
-    primary: 'bg-[#3F6A24] text-white hover:bg-[#4a7c2a] border border-transparent shadow-[0_0_15px_rgba(63,106,36,0.15)] hover:shadow-[0_0_20px_rgba(63,106,36,0.3)]',
-    default: 'bg-[#3F6A24] text-white hover:bg-[#4a7c2a] border border-transparent shadow-[0_0_15px_rgba(63,106,36,0.15)]',
-    ghost: 'bg-transparent border border-[#3F6A24] text-[#A8C69F] hover:bg-[#3F6A24]/10',
-    outline: 'bg-transparent border border-[#1A1A1A] text-[#555555] hover:border-[#3F6A24] hover:text-[#A8C69F]',
-    danger: 'bg-transparent border border-red-500 text-red-500 hover:bg-red-500/10',
+    primary: 'bg-primary text-text-primary hover:bg-accent-mid shadow-[0_0_15px_rgba(63,106,36,0.15)] hover:shadow-[0_0_20px_rgba(63,106,36,0.3)]',
+    default: 'bg-surface text-text-primary hover:bg-border-dark border border-border-dark',
+    ghost: 'bg-transparent text-text-muted hover:text-primary hover:bg-primary/10',
+    outline: 'bg-transparent border border-border-dark text-text-secondary hover:border-primary hover:text-primary',
+    danger: 'bg-transparent border border-red-500/50 text-red-500 hover:bg-red-500/10',
   };
 
   const sizes: Record<string, string> = {

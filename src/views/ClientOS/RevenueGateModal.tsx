@@ -241,13 +241,13 @@ export default function RevenueGateModal({ isOpen, onClose, onClientCreated }: R
 
                     {/* Footer */}
                     <div className="p-6 border-t border-border-dark flex justify-end gap-4 bg-surface-hover shrink-0">
-                        <Button variant="outline" onClick={onClose} className="h-12 px-6 border-border-dark hover:border-text-muted">
+                        <Button variant="outline" onClick={onClose} className="h-12 px-6">
                             Cancel
                         </Button>
                         <Button
                             type="submit"
                             form="revenue-gate-form"
-                            className="h-12 px-8 bg-primary hover:bg-accent-mid text-text-primary font-bold tracking-wide"
+                            className="h-12 px-8 font-bold tracking-wide"
                             disabled={!formData.name || !formData.revenueGate || !formData.tier}
                         >
                             CREATE CLIENT PROFILE

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo, memo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Card } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
@@ -16,30 +16,33 @@ export default function OnboardingOS({ onNavigate }: { onNavigate?: (view: strin
     const [selectedProtocol, setSelectedProtocol] = useState<OnboardingProtocol | null>(null);
 
     // Recompute protocols from live data
-    const protocols = data.onboardings.map(p => {
+    const protocols = useMemo(() => data.onboardings.map(p => {
         // Recompute from live data in case steps changed
         const freshProtocol = data.onboardings.find(o => o.id === p.id);
         return freshProtocol || p;
-    });
+    }), [data.onboardings]);
 
     // Filter logic
-    const filteredProtocols = protocols.filter(protocol => {
+    const filteredProtocols = useMemo(() => protocols.filter(protocol => {
         const client = data.clients.find(c => c.id === protocol.clientId);
         if (!client) return false;
         if (filter !== 'ALL' && !client.tier.toUpperCase().includes(filter)) return false;
         if (searchQuery && !client.name.toLowerCase().includes(searchQuery.toLowerCase())) return false;
         return true;
-    });
+    }), [protocols, data.clients, filter, searchQuery]);
 
-    const activeCount = protocols.length;
-    const blockedCount = protocols.filter(o => o.status === 'blocked').length;
-    const nearComplete = protocols.filter(o => o.progress >= 8 && o.progress < 10).length;
-    const completedCount = protocols.filter(o => o.progress === 10).length;
+    const stats = useMemo(() => {
+        const activeCount = protocols.length;
+        const blockedCount = protocols.filter(o => o.status === 'blocked').length;
+        const nearComplete = protocols.filter(o => o.progress >= 8 && o.progress < 10).length;
+        const completedCount = protocols.filter(o => o.progress === 10).length;
 
-    // Calculate average velocity (simulated based on progress)
-    const avgVelocity = protocols.length > 0
-        ? (protocols.reduce((acc, p) => acc + p.progress, 0) / protocols.length * 0.8).toFixed(1)
-        : '0.0';
+        const avgVelocity = protocols.length > 0
+            ? (protocols.reduce((acc, p) => acc + p.progress, 0) / protocols.length * 0.8).toFixed(1)
+            : '0.0';
+
+        return { activeCount, blockedCount, nearComplete, completedCount, avgVelocity };
+    }, [protocols]);
 
     // If a protocol is selected, show the detail view
     if (selectedProtocol) {
@@ -69,17 +72,17 @@ export default function OnboardingOS({ onNavigate }: { onNavigate?: (view: strin
                 <div className="flex gap-4 font-mono text-[9px] tracking-widest text-text-muted">
                     <div className="flex items-center gap-2">
                         <div className="w-1.5 h-1.5 bg-primary rounded-full" />
-                        <span>AVG VELOCITY: {avgVelocity} DAYS</span>
+                        <span>AVG VELOCITY: {stats.avgVelocity} DAYS</span>
                     </div>
                 </div>
             </div>
 
             {/* Stats Summary */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 flex-shrink-0">
-                <StatsCard label="Active Protocols" count={activeCount} />
-                <StatsCard label="Blockers Detected" count={blockedCount} status={blockedCount > 0 ? "risk" : ""} />
-                <StatsCard label="Projected Deployed" count={nearComplete} />
-                <StatsCard label="Completed" count={completedCount} status={completedCount > 0 ? "success" : ""} />
+                <StatsCard label="Active Protocols" count={stats.activeCount} />
+                <StatsCard label="Blockers Detected" count={stats.blockedCount} status={stats.blockedCount > 0 ? "risk" : ""} />
+                <StatsCard label="Projected Deployed" count={stats.nearComplete} />
+                <StatsCard label="Completed" count={stats.completedCount} status={stats.completedCount > 0 ? "success" : ""} />
             </div>
 
             {/* Main Board */}
@@ -322,7 +325,7 @@ export default function OnboardingOS({ onNavigate }: { onNavigate?: (view: strin
     );
 }
 
-function StatsCard({ label, count, status }: { label: string, count: string | number, status?: string }) {
+function StatsCardBase({ label, count, status }: { label: string, count: string | number, status?: string }) {
     return (
         <Card className="p-6 border-border-dark bg-card-alt/50 flex flex-col gap-2 relative overflow-hidden group">
             <span className="font-heading font-black text-[9px] text-text-muted tracking-widest uppercase">{label}</span>
@@ -339,3 +342,5 @@ function StatsCard({ label, count, status }: { label: string, count: string | nu
         </Card>
     );
 }
+
+const StatsCard = memo(StatsCardBase);

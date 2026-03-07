@@ -4,7 +4,7 @@ import { Badge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
 import { ArrowLeft, Users, Zap, CheckCircle2, Circle, Activity, Palette, BookOpen } from 'lucide-react';
 import { useAppData } from '../../contexts/AppDataContext';
-import React, { useState } from 'react';
+import React, { useState, useMemo, memo } from 'react';
 import ClientEditModal from './ClientEditModal';
 
 export default function ClientDetailView({ clientId, onBack, onNavigate }: { clientId: string, onBack: () => void, onNavigate?: (view: string, clientId?: string) => void }) {
@@ -23,28 +23,24 @@ export default function ClientDetailView({ clientId, onBack, onNavigate }: { cli
     );
   }
 
-  // Same health calculation logic
-  const clientTasks = data.tasks.filter(t => t.clientId === client.id);
-  const overdueTasks = clientTasks.filter(t =>
-    t.status !== 'Deployed' &&
-    t.deadline &&
-    new Date(t.deadline) < new Date()
-  );
+  const clientTasks = useMemo(() => data.tasks.filter(t => t.clientId === client.id), [data.tasks, client.id]);
 
-  const daysSinceActivity = clientTasks.length > 0
-    ? Math.floor((Date.now() - Math.max(...clientTasks.map(t => new Date(t.updatedAt).getTime()))) / 86400000)
-    : Infinity;
+  const healthScore = useMemo(() => {
+    let score = 100;
+    const overdueTasks = clientTasks.filter(t => t.deadline && new Date(t.deadline) < new Date() && t.status !== 'done');
+    score -= overdueTasks.length * 5;
 
-  let healthStatus = 'healthy';
-  let healthScore = 100;
+    const lastActivity = clientTasks.length > 0
+      ? new Date(Math.max(...clientTasks.map(t => new Date(t.updatedAt).getTime())))
+      : new Date();
 
-  if (overdueTasks.length >= 3 || daysSinceActivity > 14) {
-    healthStatus = 'critical';
-    healthScore = 40;
-  } else if (overdueTasks.length >= 1 || daysSinceActivity > 7 || clientTasks.length === 0) {
-    healthStatus = 'at-risk';
-    healthScore = 75;
-  }
+    const daysSinceMvmt = Math.floor((new Date().getTime() - lastActivity.getTime()) / (1000 * 3600 * 24));
+    if (daysSinceMvmt > 7) score -= 15;
+
+    return Math.max(0, score);
+  }, [clientTasks]);
+
+  const healthStatus = healthScore > 80 ? 'EXCELLENT' : healthScore > 60 ? 'NEEDS ATTENTION' : 'CRITICAL';
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-PK', { style: 'currency', currency: 'PKR', maximumFractionDigits: 0 }).format(amount);

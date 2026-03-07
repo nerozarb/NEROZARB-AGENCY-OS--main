@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { motion } from 'motion/react';
 import { Post, Client } from '../../utils/storage';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
@@ -170,7 +170,7 @@ export default function MonthlyView({ posts, clients, onPostClick, onAddPost }: 
                                                             <span className="truncate text-[10px] text-primary/70 ml-auto shrink-0">{client.name.split(' ')[0]}</span>
                                                         )}
                                                     </div>
-                                                );
+                                                )
                                             })}
                                             {dayPosts.length > 3 && (
                                                 <div className="text-[9px] text-text-muted text-center py-0.5 bg-background/50 rounded-sm">

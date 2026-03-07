@@ -1,4 +1,4 @@
-import { useMemo, memo } from 'react';
+import { useMemo, memo, useCallback } from 'react';
 import { motion } from 'motion/react';
 import { Card } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
@@ -87,6 +87,8 @@ export default function DashboardView({ onNavigate }: { onNavigate?: (view: stri
       .slice(0, 5);
   }, [data.tasks]);
 
+  const handleNavigateClient = useCallback(() => onNavigate?.('client'), [onNavigate]);
+
   return (
     <motion.div
       initial="hidden"
@@ -109,9 +111,9 @@ export default function DashboardView({ onNavigate }: { onNavigate?: (view: stri
       {/* KPI Row */}
       <motion.div variants={item} className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
         <KpiCard title="Cash Collected" value={formatCurrency(cashCollected)} icon={DollarSign} trend="Active" />
-        <KpiCard title="Active Sprints" value={activeClients.length.toString()} icon={Activity} trend="On Track" onClick={() => onNavigate?.('client')} />
-        <KpiCard title="Pipeline Leads" value={pipelineLeads.toString()} icon={Target} trend="Pending" onClick={() => onNavigate?.('client')} />
-        <KpiCard title="Friction Alerts" value={frictionAlerts.toString()} icon={AlertTriangle} trend={frictionAlerts > 0 ? "Action Needed" : "Clear"} alert={frictionAlerts > 0} onClick={() => onNavigate?.('client')} />
+        <KpiCard title="Active Sprints" value={activeClients.length.toString()} icon={Activity} trend="On Track" onClick={handleNavigateClient} />
+        <KpiCard title="Pipeline Leads" value={pipelineLeads.toString()} icon={Target} trend="Pending" onClick={handleNavigateClient} />
+        <KpiCard title="Friction Alerts" value={frictionAlerts.toString()} icon={AlertTriangle} trend={frictionAlerts > 0 ? "Action Needed" : "Clear"} alert={frictionAlerts > 0} onClick={handleNavigateClient} />
       </motion.div>
 
       {/* Distribution & Operations */}

@@ -5,6 +5,7 @@ import AppShell from './components/layout/AppShell';
 import { loadData, saveData, AppData } from './utils/storage';
 import { AppDataProvider } from './contexts/AppDataContext';
 import { fetchAppDataFromSupabase, syncSettingsToSupabase } from './utils/supabaseSync';
+import { GlobalErrorBoundary } from './components/layout/GlobalErrorBoundary';
 
 // Lazy-loaded view modules — only loaded when user navigates to them
 const DashboardView = lazy(() => import('./views/CommandCenter/DashboardView'));
@@ -144,34 +145,36 @@ export default function App() {
         authLevel={authLevel}
         onLogout={handleLogout}
       >
-        <Suspense fallback={<ViewLoader />}>
-          {activeView === 'command' && authLevel === 'ceo' && <DashboardView onNavigate={(view, id) => {
-            setActiveView(view);
-            if (id) setSelectedGlobalClient(id);
-          }} />}
-          {activeView === 'client' && <ClientOS onNavigate={(view, id) => {
-            setActiveView(view);
-            if (id) setSelectedGlobalClient(id);
-          }} />}
-          {activeView === 'fulfillment' && <FulfillmentOS onNavigate={(view, id) => {
-            setActiveView(view);
-            if (id) setSelectedGlobalClient(id);
-          }} />}
-          {activeView === 'content' && <ContentOS onNavigate={(view, id) => {
-            setActiveView(view);
-            if (id) setSelectedGlobalClient(id);
-          }} />}
-          {activeView === 'vault' && <KnowledgeVault selectedClient={selectedGlobalClient} />}
-          {activeView === 'onboarding' && <OnboardingOS onNavigate={(view, id) => {
-            setActiveView(view);
-            if (id) setSelectedGlobalClient(id);
-          }} />}
-          {/* Fallback if team tries to access command center */}
-          {activeView === 'command' && authLevel !== 'ceo' && <FulfillmentOS onNavigate={(view, id) => {
-            setActiveView(view);
-            if (id) setSelectedGlobalClient(id);
-          }} />}
-        </Suspense>
+        <GlobalErrorBoundary>
+          <Suspense fallback={<ViewLoader />}>
+            {activeView === 'command' && authLevel === 'ceo' && <DashboardView onNavigate={(view, id) => {
+              setActiveView(view);
+              if (id) setSelectedGlobalClient(id);
+            }} />}
+            {activeView === 'client' && <ClientOS onNavigate={(view, id) => {
+              setActiveView(view);
+              if (id) setSelectedGlobalClient(id);
+            }} />}
+            {activeView === 'fulfillment' && <FulfillmentOS onNavigate={(view, id) => {
+              setActiveView(view);
+              if (id) setSelectedGlobalClient(id);
+            }} />}
+            {activeView === 'content' && <ContentOS onNavigate={(view, id) => {
+              setActiveView(view);
+              if (id) setSelectedGlobalClient(id);
+            }} />}
+            {activeView === 'vault' && <KnowledgeVault selectedClient={selectedGlobalClient} />}
+            {activeView === 'onboarding' && <OnboardingOS onNavigate={(view, id) => {
+              setActiveView(view);
+              if (id) setSelectedGlobalClient(id);
+            }} />}
+            {/* Fallback if team tries to access command center */}
+            {activeView === 'command' && authLevel !== 'ceo' && <FulfillmentOS onNavigate={(view, id) => {
+              setActiveView(view);
+              if (id) setSelectedGlobalClient(id);
+            }} />}
+          </Suspense>
+        </GlobalErrorBoundary>
       </AppShell>
     </AppDataProvider>
   );
