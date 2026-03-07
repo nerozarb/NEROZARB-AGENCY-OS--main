@@ -78,13 +78,13 @@ export default function MonthlyView({ posts, clients, onPostClick, onAddPost }: 
                 </div>
 
                 {/* Legend */}
-                <div className="flex gap-4 text-xs font-mono text-text-muted">
-                    <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-border-dark" /> Planned</div>
-                    <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-blue-500" /> Production</div>
-                    <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-yellow-500" /> Review</div>
-                    <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-orange-500" /> CEO Approval</div>
-                    <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-purple-500" /> Scheduled</div>
-                    <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-green-500" /> Published</div>
+                <div className="flex flex-wrap justify-end gap-2 text-[10px] font-mono uppercase tracking-widest text-text-muted mt-2 md:mt-0">
+                    <span className="flex items-center gap-1.5 px-2 py-1 bg-border-dark/20 text-text-secondary border border-border-dark rounded-sm"><div className="w-2 h-2 rounded-full bg-border-dark" /> Planned</span>
+                    <span className="flex items-center gap-1.5 px-2 py-1 bg-blue-500/10 text-blue-500 border border-blue-500/20 rounded-sm"><div className="w-2 h-2 rounded-full bg-blue-500" /> Production</span>
+                    <span className="flex items-center gap-1.5 px-2 py-1 bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 rounded-sm"><div className="w-2 h-2 rounded-full bg-yellow-500" /> Review</span>
+                    <span className="flex items-center gap-1.5 px-2 py-1 bg-orange-500/10 text-orange-500 border border-orange-500/20 rounded-sm"><div className="w-2 h-2 rounded-full bg-orange-500" /> CEO Appr</span>
+                    <span className="flex items-center gap-1.5 px-2 py-1 bg-purple-500/10 text-purple-500 border border-purple-500/20 rounded-sm"><div className="w-2 h-2 rounded-full bg-purple-500" /> Scheduled</span>
+                    <span className="flex items-center gap-1.5 px-2 py-1 bg-green-500/10 text-green-500 border border-green-500/20 rounded-sm"><div className="w-2 h-2 rounded-full bg-green-500" /> Published</span>
                 </div>
             </div>
 
@@ -156,15 +156,16 @@ export default function MonthlyView({ posts, clients, onPostClick, onAddPost }: 
                                         <div className="flex-1 space-y-1 relative z-10 pointer-events-none">
                                             {dayPosts.slice(0, 3).map(post => {
                                                 const client = clients.find(c => c.id === post.clientId);
+                                                const isOverdueItem = isPast && post.status !== 'PUBLISHED' && post.status !== 'SCHEDULED';
                                                 return (
                                                     <div
                                                         key={post.id}
                                                         onClick={(e) => { e.stopPropagation(); onPostClick(post); }}
-                                                        className="text-xs p-1 rounded-sm bg-card-alt  flex items-center gap-1.5 cursor-pointer hover:border-text-muted/40 transition-colors pointer-events-auto truncate"
+                                                        className={`text-xs p-1 rounded-sm bg-card-alt flex items-center gap-1.5 cursor-pointer transition-colors pointer-events-auto truncate ${isOverdueItem ? 'border border-red-500/50 bg-red-500/5 hover:border-red-500' : 'hover:border-text-muted/40'}`}
                                                         title={post.hook || post.postType}
                                                     >
                                                         <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${getStatusColor(post.status)}`} />
-                                                        <span className="truncate text-[10px] text-text-primary capitalize">{post.platforms[0]}</span>
+                                                        <span className={`truncate text-[10px] capitalize ${isOverdueItem ? 'text-red-400 font-bold' : 'text-text-primary'}`}>{post.platforms[0]}</span>
                                                         {client && (
                                                             <span className="truncate text-[10px] text-primary/70 ml-auto shrink-0">{client.name.split(' ')[0]}</span>
                                                         )}

@@ -61,7 +61,7 @@ export const ProtocolCard: React.FC<ProtocolCardProps> = ({ protocol, onClick, o
 
                 <div className="flex items-center justify-between mt-auto pt-4 border-t border-border-dark/50">
                     <span className="font-mono text-[9px] text-text-muted">
-                        UPDATED: {new Date(protocol.updatedAt).toLocaleDateString()}
+                        UPDATED: {new Date(protocol.updatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                     </span>
                     {(protocol.linkedClientId || protocol.linkedTaskTypes.length > 0) && (
                         <div className="flex gap-1">

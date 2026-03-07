@@ -6,6 +6,7 @@ import { Search, ChevronRight, Activity, Clock, Users, Shield, Rocket, Plus, Ale
 import { useAppData } from '../../contexts/AppDataContext';
 import { OnboardingProtocol } from '../../utils/storage';
 import { formatDistanceToNow } from 'date-fns';
+import { Button } from '../../components/ui/Button';
 import OnboardingDetailView from './OnboardingDetailView';
 
 export default function OnboardingOS({ onNavigate }: { onNavigate?: (view: string, id?: string) => void }) {
@@ -144,13 +145,13 @@ export default function OnboardingOS({ onNavigate }: { onNavigate?: (view: strin
                                     }
                                 </p>
                                 {!searchQuery && (
-                                    <button
+                                    <Button
                                         onClick={() => onNavigate?.('client')}
-                                        className="flex items-center gap-2 px-4 py-2 bg-card-alt  text-text-muted hover:text-primary hover:border-primary transition-all font-mono text-[10px] tracking-widest uppercase"
+                                        className="mt-2 text-xs"
                                     >
-                                        <Plus size={14} />
-                                        GO TO CLIENT OS
-                                    </button>
+                                        <Plus size={16} className="mr-2" />
+                                        GO TO CLIENT OS TO INITIALIZE
+                                    </Button>
                                 )}
                             </div>
                         ) : (

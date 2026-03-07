@@ -60,6 +60,23 @@ export default function TaskDetailModal({ isOpen, onClose, task: modalTask, onNa
 
         {/* Header Meta */}
         <div>
+          <div className="text-[10px] font-mono text-text-muted tracking-widest uppercase mb-3 flex items-center gap-2">
+            <span>Fulfillment OS</span>
+            <span>/</span>
+            <button
+              onClick={() => {
+                if (onNavigate) {
+                  onNavigate('client', task.clientId.toString());
+                  onClose();
+                }
+              }}
+              className="hover:text-primary transition-colors"
+            >
+              {clientName}
+            </button>
+            <span>/</span>
+            <span className="text-text-primary truncate max-w-[200px]">{task.name}</span>
+          </div>
           <div className="flex items-center gap-3 mb-2">
             <h3 className="font-heading text-2xl text-text-primary">{task.name}</h3>
             <Badge status={task.priority === 'critical' ? 'critical' : task.priority === 'high' ? 'at-risk' : 'healthy'}>
@@ -235,7 +252,7 @@ export default function TaskDetailModal({ isOpen, onClose, task: modalTask, onNa
               )}
               {authLevel === 'ceo' && task.currentStage !== 'DEPLOYED' && (
                 <Button variant="ghost" className="w-full justify-center text-red-500 hover:text-red-400 hover:bg-red-500/10">
-                  MARK EXCEPTION / DELAY
+                  MARK AS BLOCKED
                 </Button>
               )}
             </div>

@@ -71,11 +71,12 @@ export default function NewTaskModal({ isOpen, onClose }: NewTaskModalProps) {
             placeholder="e.g. Q4 Strategy Deck"
             value={name}
             onChange={e => setName(e.target.value)}
+            required
           />
 
           <div className="space-y-2">
             <label className="block font-mono text-xs font-medium text-text-muted">
-              Client
+              Client <span className="text-red-500 ml-1">*</span>
             </label>
             <select
               value={clientId}
@@ -192,7 +193,7 @@ export default function NewTaskModal({ isOpen, onClose }: NewTaskModalProps) {
 
         <div className="pt-4 border-t border-border-dark flex justify-end gap-3">
           <Button variant="ghost" onClick={onClose}>CANCEL</Button>
-          <Button onClick={handleSubmit}>CREATE TASK</Button>
+          <Button onClick={handleSubmit} disabled={!name || clientId === ''}>CREATE TASK</Button>
         </div>
       </div>
     </Modal>

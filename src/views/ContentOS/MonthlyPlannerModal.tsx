@@ -137,11 +137,11 @@ export default function MonthlyPlannerModal({ isOpen, onClose, clientId, onNavig
                                 <thead className="sticky top-0 bg-card border-b border-border-dark z-10">
                                     <tr className="text-[10px] font-mono tracking-widest text-text-muted uppercase">
                                         <th className="p-3 w-12 text-center">#</th>
-                                        <th className="p-3 w-40">Date</th>
+                                        <th className="p-3 w-40">Date <span className="text-red-500">*</span></th>
                                         <th className="p-3 w-40">Platform</th>
                                         <th className="p-3 w-48">Format</th>
                                         <th className="p-3 w-48">Pillar</th>
-                                        <th className="p-3">Hook Idea / Concept</th>
+                                        <th className="p-3">Hook Idea / Concept <span className="text-red-500">*</span></th>
                                         <th className="p-3 w-48">Assignee</th>
                                         <th className="p-3 w-16 text-center">Del</th>
                                     </tr>
@@ -233,7 +233,10 @@ export default function MonthlyPlannerModal({ isOpen, onClose, clientId, onNavig
                             </div>
                             <div className="flex gap-4">
                                 <Button variant="ghost" onClick={onClose}>CANCEL</Button>
-                                <Button onClick={handleGenerate} disabled={isGenerating || rows.length === 0 || !clientId}>
+                                <Button
+                                    onClick={handleGenerate}
+                                    disabled={isGenerating || rows.length === 0 || !clientId || !rows.every(r => r.date && r.hookIdea.trim() !== '')}
+                                >
                                     {isGenerating ? (
                                         <div className="w-4 h-4 rounded-full border-2 border-background border-t-transparent animate-spin mr-2" />
                                     ) : (

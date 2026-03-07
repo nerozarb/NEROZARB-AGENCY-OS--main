@@ -45,6 +45,7 @@ export default function PostDetailModal({ isOpen, onClose, post, onNavigate }: P
 
   // Performance log state
   const [showPerformanceInput, setShowPerformanceInput] = useState(false);
+  const [activeTab, setActiveTab] = useState<'content' | 'details'>('content');
   const [metrics, setMetrics] = useState<Partial<PerformanceLog>>(post.performance || {
     reach: 0,
     impressions: 0,
@@ -144,11 +145,27 @@ export default function PostDetailModal({ isOpen, onClose, post, onNavigate }: P
               </div>
             </div>
 
+            {/* Mobile Tabs */}
+            <div className="md:hidden flex border-b border-border-dark bg-card shrink-0">
+              <button
+                className={`flex-1 py-3 text-xs font-mono tracking-widest uppercase transition-colors ${activeTab === 'content' ? 'text-primary border-b-2 border-primary bg-primary/5' : 'text-text-muted hover:text-text-primary'}`}
+                onClick={() => setActiveTab('content')}
+              >
+                Content
+              </button>
+              <button
+                className={`flex-1 py-3 text-xs font-mono tracking-widest uppercase transition-colors ${activeTab === 'details' ? 'text-primary border-b-2 border-primary bg-primary/5' : 'text-text-muted hover:text-text-primary'}`}
+                onClick={() => setActiveTab('details')}
+              >
+                Details
+              </button>
+            </div>
+
             {/* Body */}
             <div className="flex-1 overflow-hidden flex flex-col md:flex-row">
 
               {/* LEFT: Pipeline + Content + Activity */}
-              <div className="flex-1 border-r border-border-dark flex flex-col overflow-y-auto custom-scrollbar p-8 space-y-10">
+              <div className={`flex-1 md:border-r border-border-dark flex-col overflow-y-auto custom-scrollbar p-5 md:p-8 space-y-10 ${activeTab === 'content' ? 'flex' : 'hidden md:flex'}`}>
 
                 {/* Stage Pipeline */}
                 <section className="space-y-4">
@@ -257,7 +274,7 @@ export default function PostDetailModal({ isOpen, onClose, post, onNavigate }: P
               </div>
 
               {/* RIGHT: Meta + Assets + Client Context + Performance */}
-              <div className="w-full md:w-96 bg-card-alt flex flex-col overflow-y-auto custom-scrollbar p-6 space-y-8">
+              <div className={`w-full md:w-96 bg-card-alt flex-col overflow-y-auto custom-scrollbar p-5 md:p-6 space-y-8 ${activeTab === 'details' ? 'flex' : 'hidden md:flex'}`}>
 
                 {/* Metadata */}
                 <section className="space-y-4">

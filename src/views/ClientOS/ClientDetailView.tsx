@@ -66,6 +66,11 @@ export default function ClientDetailView({ clientId, onBack, onNavigate }: { cli
             <ArrowLeft size={18} />
           </button>
           <div className="space-y-2">
+            <div className="text-[10px] font-mono text-text-muted tracking-widest uppercase mb-2 mt-1 flex items-center gap-2">
+              <button onClick={onBack} className="hover:text-primary transition-colors">Client OS</button>
+              <span>/</span>
+              <span className="text-text-primary">{client.name}</span>
+            </div>
             <div className="flex items-center gap-4 flex-wrap">
               <h1 className="font-heading text-4xl font-black text-text-primary tracking-tight uppercase">{client.name}</h1>
               <div className="flex gap-2">

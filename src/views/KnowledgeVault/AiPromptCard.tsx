@@ -50,7 +50,7 @@ export const AiPromptCard: React.FC<AiPromptCardProps> = ({ protocol, onClick, o
 
                 <div className="bg-[#111] border border-[#222] rounded-sm p-3 mb-4 flex-1 font-mono text-xs text-zinc-400 line-clamp-3 relative overflow-hidden">
                     <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#111] pointer-events-none" />
-                    {protocol.content.substring(0, 150)}...
+                    {protocol.content.substring(0, 100)}...
                 </div>
 
                 <div className="mt-auto border-t border-border-dark/50 pt-4 flex gap-2">

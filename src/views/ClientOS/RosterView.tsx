@@ -248,7 +248,7 @@ export default function RosterView({ onSelectClient }: { onSelectClient: (id: st
           </div>
         ) : (
           <div className="flex-1 overflow-auto custom-scrollbar scroll-touch">
-            <table className="hidden md:table w-full text-left whitespace-nowrap">
+            <table className="hidden md:table w-full min-w-[1000px] text-left whitespace-nowrap">
               <thead className="sticky top-0 z-20 bg-card-alt border-b border-border-dark">
                 <tr>
                   <th className="p-4 w-10">
@@ -388,14 +388,19 @@ export default function RosterView({ onSelectClient }: { onSelectClient: (id: st
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1">
-                            <div className={`w-2 h-2 rounded-full flex-shrink-0 ${health === 'healthy' ? 'bg-primary' : health === 'at-risk' ? 'bg-yellow-500' : 'bg-red-500'}`} />
                             <span className="font-heading font-bold text-[13px] text-text-primary tracking-tight uppercase truncate">{client.name}</span>
                           </div>
-                          <div className="flex items-center gap-2 ml-4">
+                          <div className="flex items-center gap-2">
                             <Badge status={client.status === 'Active Sprint' || client.status === 'Retainer' ? 'healthy' : 'review'}>{client.status}</Badge>
                             <span className="font-sans text-[11px] text-accent-light">{client.tier}</span>
                           </div>
-                          <p className="font-mono text-[10px] text-text-muted mt-1 ml-4 uppercase">{calculateLastActivity(client)}</p>
+                          <div className="flex items-center gap-4 mt-2">
+                            <div className="flex items-center gap-1.5">
+                              <div className={`w-2 h-2 rounded-full flex-shrink-0 ${health === 'healthy' ? 'bg-primary' : health === 'at-risk' ? 'bg-yellow-500' : 'bg-red-500'}`} />
+                              <span className="font-mono text-[9px] text-text-secondary uppercase tracking-widest">{health}</span>
+                            </div>
+                            <p className="font-mono text-[9px] text-text-muted uppercase tracking-widest">{calculateLastActivity(client)}</p>
+                          </div>
                         </div>
                         <ChevronRight size={16} className="text-text-muted" />
                       </div>

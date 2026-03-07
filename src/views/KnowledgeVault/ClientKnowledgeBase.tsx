@@ -134,7 +134,7 @@ export function ClientKnowledgeBase({ clientId }: { clientId: number }) {
                                         </div>
                                         <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] bg-card  p-4 rounded-sm shadow">
                                             <div className="flex items-center justify-between mb-1">
-                                                <div className="font-mono text-xs text-text-secondary">{new Date(event.date).toLocaleDateString()}</div>
+                                                <div className="font-mono text-xs text-text-secondary">{new Date(event.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</div>
                                             </div>
                                             <div className="font-mono text-sm text-text-primary">{event.description}</div>
                                         </div>

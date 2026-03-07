@@ -44,6 +44,12 @@ export default function KnowledgeVault({ selectedClient }: { selectedClient?: st
     // Copy states for Prompts
     const [copiedId, setCopiedId] = useState<number | null>(null);
 
+    // Pagination
+    const [visibleCount, setVisibleCount] = useState(12);
+    useEffect(() => {
+        setVisibleCount(12);
+    }, [searchQuery, activeCategory, activePillar, activeStatus, selectedClient]);
+
     // Tab scroll fade
     const tabScrollRef = useRef<HTMLDivElement>(null);
     const [showTabFade, setShowTabFade] = useState(false);
@@ -62,6 +68,7 @@ export default function KnowledgeVault({ selectedClient }: { selectedClient?: st
         navigator.clipboard.writeText(content);
         recordPromptUsage(id);
         setCopiedId(id);
+        showToast('Prompt copied to clipboard!');
         setTimeout(() => setCopiedId(null), 2000);
     };
 
@@ -182,8 +189,8 @@ export default function KnowledgeVault({ selectedClient }: { selectedClient?: st
                                 key={s}
                                 onClick={() => setActiveStatus(s)}
                                 className={`px-3 py-1 text-xs font-mono uppercase tracking-widest rounded-sm border transition-colors ${activeStatus === s
-                                        ? 'bg-primary/10 border-primary/50 text-primary'
-                                        : 'bg-transparent border-border-dark text-text-muted hover:text-text-primary hover:border-text-muted'
+                                    ? 'bg-primary/10 border-primary/50 text-primary'
+                                    : 'bg-transparent border-border-dark text-text-muted hover:text-text-primary hover:border-text-muted'
                                     }`}
                             >
                                 {s === 'all' ? 'All Status' : s}
@@ -195,7 +202,7 @@ export default function KnowledgeVault({ selectedClient }: { selectedClient?: st
                     <div className="flex gap-1.5 flex-wrap">
                         <button
                             onClick={() => setActivePillar('all')}
-                            className={`px-3 py-1 text-xs font-mono uppercase tracking-widest rounded-sm border transition-colors ${activePillar === 'all'
+                            className={`px-4 py-1.5 text-[11px] sm:text-xs font-mono uppercase tracking-widest rounded-sm border transition-colors ${activePillar === 'all'
                                 ? 'bg-primary/10 border-primary/50 text-primary'
                                 : 'bg-transparent border-border-dark text-text-muted hover:text-text-primary hover:border-text-muted'
                                 }`}
@@ -206,7 +213,7 @@ export default function KnowledgeVault({ selectedClient }: { selectedClient?: st
                             <button
                                 key={pillar}
                                 onClick={() => setActivePillar(pillar)}
-                                className={`px-3 py-1 text-xs font-mono uppercase tracking-widest rounded-sm border transition-colors ${activePillar === pillar
+                                className={`px-4 py-1.5 text-[11px] sm:text-xs font-mono uppercase tracking-widest rounded-sm border transition-colors ${activePillar === pillar
                                     ? 'bg-primary/10 border-primary/50 text-primary'
                                     : 'bg-transparent border-border-dark text-text-muted hover:text-text-primary hover:border-text-muted'
                                     }`}
@@ -247,30 +254,44 @@ export default function KnowledgeVault({ selectedClient }: { selectedClient?: st
                             </Button>
                         </div>
                     ) : (
-                        <div className={
-                            viewMode === 'grid'
-                                ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
-                                : "flex flex-col gap-2"
-                        }>
-                            {filteredProtocols.map(protocol => (
-                                protocol.category === 'ai-prompt' ? (
-                                    <AiPromptCard
-                                        key={protocol.id}
-                                        protocol={protocol}
-                                        onClick={() => { setViewPrompt(protocol); setIsPromptModalOpen(true); }}
-                                        onCopy={(e) => handleCopyPrompt(e, protocol.id, protocol.content)}
-                                        onDuplicate={(e) => { e.stopPropagation(); handleDuplicate(protocol); }}
-                                        copiedState={copiedId === protocol.id}
-                                    />
-                                ) : (
-                                    <ProtocolCard
-                                        key={protocol.id}
-                                        protocol={protocol}
-                                        onClick={() => { setEditProtocol(protocol); setIsEditorOpen(true); }}
-                                        onDuplicate={() => handleDuplicate(protocol)}
-                                    />
-                                )
-                            ))}
+                        <div className="flex flex-col h-full">
+                            {activeCategory !== 'client-knowledge-base' && (
+                                <div className="text-[10px] font-mono text-text-muted mb-4 tracking-widest uppercase">
+                                    {filteredProtocols.length} Result{filteredProtocols.length !== 1 ? 's' : ''} Found
+                                </div>
+                            )}
+                            <div className={
+                                viewMode === 'grid'
+                                    ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
+                                    : "flex flex-col gap-2"
+                            }>
+                                {filteredProtocols.slice(0, visibleCount).map(protocol => (
+                                    protocol.category === 'ai-prompt' ? (
+                                        <AiPromptCard
+                                            key={protocol.id}
+                                            protocol={protocol}
+                                            onClick={() => { setViewPrompt(protocol); setIsPromptModalOpen(true); }}
+                                            onCopy={(e) => handleCopyPrompt(e, protocol.id, protocol.content)}
+                                            onDuplicate={(e) => { e.stopPropagation(); handleDuplicate(protocol); }}
+                                            copiedState={copiedId === protocol.id}
+                                        />
+                                    ) : (
+                                        <ProtocolCard
+                                            key={protocol.id}
+                                            protocol={protocol}
+                                            onClick={() => { setEditProtocol(protocol); setIsEditorOpen(true); }}
+                                            onDuplicate={() => handleDuplicate(protocol)}
+                                        />
+                                    )
+                                ))}
+                            </div>
+                            {visibleCount < filteredProtocols.length && (
+                                <div className="py-8 flex justify-center mt-4">
+                                    <Button variant="outline" onClick={() => setVisibleCount(v => v + 12)}>
+                                        LOAD MORE PROTOCOLS
+                                    </Button>
+                                </div>
+                            )}
                         </div>
                     )}
                 </div>

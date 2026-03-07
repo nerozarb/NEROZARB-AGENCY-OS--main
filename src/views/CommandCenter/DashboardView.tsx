@@ -258,12 +258,12 @@ export default function DashboardView({ onNavigate }: { onNavigate?: (view: stri
 
 const KpiCard = memo(function KpiCard({ title, value, icon: Icon, trend, alert = false, onClick }: any) {
   return (
-    <Card accentTop className={`p-4 md:p-5 group ${onClick ? 'cursor-pointer hover:bg-card-alt transition-colors active:scale-[0.98]' : 'cursor-default'}`} onClick={onClick}>
+    <Card accentTop className={`p-3 sm:p-4 md:p-5 group transition-all duration-300 hover:border-primary/50 hover:bg-card-alt hover:-translate-y-0.5 ${onClick ? 'cursor-pointer active:scale-[0.98]' : 'cursor-default'}`} onClick={onClick}>
       <div className="flex justify-between items-start mb-4">
-        <p className="font-mono text-xs font-medium text-text-muted">{title}</p>
-        <Icon size={14} className={`transition-transform duration-300 group-hover:scale-110 ${alert ? 'text-red-500' : 'text-primary'}`} />
+        <p className="font-mono text-[10px] sm:text-xs font-medium text-text-muted leading-tight">{title}</p>
+        <Icon size={14} className={`transition-transform duration-300 group-hover:scale-110 shrink-0 ${alert ? 'text-red-500' : 'text-primary'}`} />
       </div>
-      <p className="font-heading text-2xl md:text-3xl text-text-primary mb-2">{value}</p>
+      <p className="font-heading text-lg sm:text-xl md:text-2xl lg:text-3xl text-text-primary mb-2 tracking-tight truncate" title={value}>{value}</p>
       <Badge status={alert ? 'critical' : 'healthy'}>{trend}</Badge>
     </Card>
   );
