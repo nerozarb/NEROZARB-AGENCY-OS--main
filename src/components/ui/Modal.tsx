@@ -19,10 +19,11 @@ interface ModalProps {
   onClose: () => void;
   title: string;
   width?: number;
+  footer?: ReactNode;
   children: ReactNode;
 }
 
-export function Modal({ isOpen, onClose, title, width = 500, children }: ModalProps) {
+export function Modal({ isOpen, onClose, title, width = 500, footer, children }: ModalProps) {
   useEscapeKey(isOpen, onClose);
 
   return (
@@ -63,6 +64,11 @@ export function Modal({ isOpen, onClose, title, width = 500, children }: ModalPr
             <div className="p-5 overflow-y-auto custom-scrollbar scroll-touch flex-1 min-h-0">
               {children}
             </div>
+            {footer && (
+              <div className="p-5 border-t border-border-dark flex-shrink-0 bg-[#141820]">
+                {footer}
+              </div>
+            )}
           </motion.div>
 
           {/* Desktop: centered modal */}
@@ -86,6 +92,11 @@ export function Modal({ isOpen, onClose, title, width = 500, children }: ModalPr
             <div className="p-6 overflow-y-auto custom-scrollbar min-h-0">
               {children}
             </div>
+            {footer && (
+              <div className="p-6 border-t border-border-dark flex-shrink-0 bg-[#141820]">
+                {footer}
+              </div>
+            )}
           </motion.div>
         </>
       )}
