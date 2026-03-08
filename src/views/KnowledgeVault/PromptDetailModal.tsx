@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
-import { X, Copy, TerminalSquare, AlertCircle, Edit2 } from 'lucide-react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { Modal } from '../../components/ui/Modal';
+import { Copy, TerminalSquare, AlertCircle, Edit2, CheckCircle2 } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
-import { Input } from '../../components/ui/Input';
 import { Protocol } from '../../utils/storage';
 import { useAppData } from '../../contexts/AppDataContext';
 
@@ -16,13 +15,6 @@ interface PromptDetailModalProps {
 export function PromptDetailModal({ isOpen, onClose, protocol, onEdit }: PromptDetailModalProps) {
     const { recordPromptUsage } = useAppData();
 
-    useEffect(() => {
-        const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.key === 'Escape' && isOpen) onClose();
-        };
-        window.addEventListener('keydown', handleKeyDown);
-        return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [isOpen, onClose]);
     const [copied, setCopied] = useState(false);
     const [variables, setVariables] = useState<string[]>([]);
     const [variableValues, setVariableValues] = useState<Record<string, string>>({});
@@ -45,10 +37,8 @@ export function PromptDetailModal({ isOpen, onClose, protocol, onEdit }: PromptD
         if (!protocol) return;
         let finalContent = protocol.content;
 
-        // Use a more robust replacement that handles special characters in variable names
         Object.entries(variableValues).forEach(([key, val]) => {
             if (val !== undefined && val !== null) {
-                // Escape key for regex
                 const escapedKey = key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
                 finalContent = finalContent.replace(new RegExp(`\\[\\[${escapedKey}\\]\\]`, 'g'), val.toString());
             }
@@ -60,136 +50,143 @@ export function PromptDetailModal({ isOpen, onClose, protocol, onEdit }: PromptD
         setTimeout(() => setCopied(false), 2000);
     };
 
-    if (!isOpen || !protocol) return null;
+    const renderedContent = useMemo(() => {
+        if (!protocol) return '';
+        return Object.entries(variableValues).reduce((content, [key, val]) => {
+            if (val !== undefined && val !== null && val !== '') {
+                const escapedKey = key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                return content.replace(
+                    new RegExp(`\\[\\[${escapedKey}\\]\\]`, 'g'),
+                    `<span class="bg-primary/20 text-primary border-b border-primary/40 px-0.5 rounded-t-sm">${val}</span>`
+                );
+            }
+            return content;
+        }, protocol.content);
+    }, [protocol, variableValues]);
+
+    if (!protocol) return null;
 
     return (
-        <AnimatePresence>
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-                <motion.div
-                    initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                    className="bg-[#0A0A0A]  rounded-sm w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.5)]"
-                >
-                    {/* Sticky Header */}
-                    <div className="flex justify-between items-center p-6 border-b border-border-dark bg-[#0A0A0A] sticky top-0 z-10">
-                        <div className="flex items-center gap-3">
-                            <div className="p-2 bg-primary/20 rounded-sm">
-                                <TerminalSquare className="w-6 h-6 text-primary" />
-                            </div>
-                            <div>
-                                <h2 className="font-heading text-xl text-text-primary uppercase tracking-wider flex items-center gap-2">
-                                    {protocol.title}
-                                </h2>
-                                <div className="flex items-center gap-2 mt-1">
-                                    <span className="font-mono text-[10px] text-primary tracking-widest uppercase border border-primary/30 px-1.5 py-0.5 rounded-sm bg-primary/10">
-                                        {protocol.pillar}
-                                    </span>
-                                    {protocol.promptTool && (
-                                        <span className="font-mono text-[10px] text-text-secondary tracking-widest uppercase  px-1.5 py-0.5 rounded-sm">
-                                            {protocol.promptTool === 'both' ? 'AGNOSTIC' : protocol.promptTool.toUpperCase()}
-                                        </span>
-                                    )}
-                                </div>
-                            </div>
+        <Modal
+            isOpen={isOpen}
+            onClose={onClose}
+            title={
+                <div className="flex items-center gap-3">
+                    <div className="p-2 bg-primary/20 rounded-sm shrink-0">
+                        <TerminalSquare className="w-5 h-5 text-primary" />
+                    </div>
+                    <div className="min-w-0">
+                        <h2 className="font-heading text-xl text-text-primary uppercase tracking-wider truncate">
+                            {protocol.title}
+                        </h2>
+                        <div className="flex items-center gap-2 mt-0.5">
+                            <span className="font-mono text-[9px] text-primary tracking-widest uppercase border border-primary/30 px-1.5 py-0.5 rounded-sm bg-primary/10">
+                                {protocol.pillar}
+                            </span>
+                            {protocol.promptTool && (
+                                <span className="font-mono text-[9px] text-text-muted tracking-widest uppercase bg-border-dark/30 px-1.5 py-0.5 rounded-sm">
+                                    {protocol.promptTool === 'both' ? 'AGNOSTIC' : protocol.promptTool.toUpperCase()}
+                                </span>
+                            )}
                         </div>
-                        <div className="flex items-center gap-3">
-                            <Button variant="outline" onClick={() => onEdit(protocol)} className="font-mono text-xs px-3">
-                                <Edit2 className="w-3.5 h-3.5 mr-2" />
-                                EDIT
-                            </Button>
-                            <button
-                                onClick={handleCopy}
-                                disabled={copied}
-                                className={`flex items-center justify-center gap-2 py-2 px-6 text-xs font-mono uppercase tracking-widest transition-colors rounded-sm ${copied
+                    </div>
+                </div>
+            }
+            width={1000}
+            footer={
+                <div className="flex flex-col sm:flex-row justify-between items-center w-full gap-4">
+                    <Button variant="outline" onClick={() => onEdit(protocol)} className="font-mono text-[10px] uppercase w-full sm:w-auto h-11">
+                        <Edit2 className="w-3.5 h-3.5 mr-2" />
+                        EDIT TEMPLATE
+                    </Button>
+                    <div className="flex items-center gap-3 w-full sm:w-auto">
+                        <Button variant="ghost" onClick={onClose} className="text-text-muted hover:text-text-primary text-[10px] uppercase font-mono">
+                            CLOSE
+                        </Button>
+                        <Button
+                            onClick={handleCopy}
+                            disabled={copied}
+                            className={`flex-1 sm:flex-initial min-w-[200px] h-11 font-mono text-[10px] uppercase tracking-widest transition-all ${copied
                                     ? 'bg-primary/20 text-primary border border-primary/50'
-                                    : 'bg-primary text-black hover:bg-primary-hover border border-primary'
-                                    }`}
-                            >
-                                {copied ? (<><span>[ COPIED ]</span></>) : (<><Copy className="w-4 h-4" /> <span>COPY PROMPT</span></>)}
-                            </button>
-                            <button onClick={onClose} className="text-text-muted hover:text-text-primary transition-colors p-2 ml-2 hover:bg-white/5 rounded-sm">
-                                <X className="w-5 h-5" />
-                            </button>
+                                    : 'bg-primary hover:bg-accent-mid text-text-primary'
+                                }`}
+                        >
+                            {copied ? (
+                                <><CheckCircle2 className="w-4 h-4 mr-2" /> [ COPIED ]</>
+                            ) : (
+                                <><Copy className="w-4 h-4 mr-2" /> COPY PROMPT</>
+                            )}
+                        </Button>
+                    </div>
+                </div>
+            }
+        >
+            <div className="flex flex-col md:flex-row -m-6 h-full min-h-[500px]">
+                {/* Left: Prompt Area */}
+                <div className="flex-1 p-6 md:p-8 bg-background/50 overflow-y-auto border-r border-border-dark custom-scrollbar">
+                    <div className="space-y-4">
+                        <h4 className="font-mono text-[10px] uppercase tracking-widest text-text-muted border-b border-border-dark pb-2">
+                            RAW PROMPT TEMPLATE
+                        </h4>
+                        <div className="bg-[#0c0e12] border border-border-dark p-6 rounded-sm">
+                            <pre className="font-mono text-sm text-text-primary whitespace-pre-wrap leading-relaxed select-all">
+                                {renderedContent.split('\n').map((line, i) => (
+                                    <div key={i} dangerouslySetInnerHTML={{ __html: line || '&nbsp;' }} />
+                                ))}
+                            </pre>
                         </div>
                     </div>
+                </div>
 
-                    {/* Main Content Area */}
-                    <div className="flex-1 overflow-hidden flex flex-col md:flex-row">
+                {/* Right: Variables sidebar */}
+                <div className="w-full md:w-80 bg-card p-6 md:p-8 overflow-y-auto space-y-8 custom-scrollbar shrink-0">
+                    <section className="space-y-6">
+                        <h4 className="font-mono text-[10px] uppercase tracking-widest text-primary flex items-center gap-2 border-b border-border-dark pb-2">
+                            <AlertCircle className="w-3 h-3" />
+                            VARIABLES
+                        </h4>
 
-                        {/* Prompt Display (Left) */}
-                        <div className="flex-1 p-6 overflow-y-auto custom-scrollbar border-r border-border-dark bg-black/40">
+                        {variables.length > 0 ? (
                             <div className="space-y-4">
-                                <h3 className="font-mono text-[10px] uppercase tracking-widest text-text-secondary">Raw Prompt Request</h3>
-                                <pre className="font-mono text-sm text-text-primary whitespace-pre-wrap leading-relaxed bg-[#111] p-4 rounded-sm  select-all">
-                                    <code>
-                                        {Object.entries(variableValues).reduce((content, [key, val]) => {
-                                            if (val !== undefined && val !== null && val !== '') {
-                                                const escapedKey = key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                                                return content.replace(new RegExp(`\\[\\[${escapedKey}\\]\\]`, 'g'), `<span class="bg-primary/20 text-primary border-b border-primary/40 px-0.5 rounded-t-sm">${val}</span>`);
-                                            }
-                                            return content;
-                                        }, protocol.content).split('\n').map((line, i) => (
-                                            <div key={i} dangerouslySetInnerHTML={{ __html: line || '&nbsp;' }} />
-                                        ))}
-                                    </code>
-                                </pre>
-                            </div>
-                        </div>
-
-                        {/* Variables Sidebar (Right) */}
-                        <div className="w-full md:w-80 p-6 overflow-y-auto bg-card">
-                            <div className="space-y-6">
-                                <div>
-                                    <h3 className="font-mono text-[10px] uppercase tracking-widest text-primary flex items-center gap-2 border-b border-border-dark pb-2 mb-4">
-                                        <AlertCircle className="w-3 h-3" />
-                                        Variables Detected
-                                    </h3>
-
-                                    {variables.length > 0 ? (
-                                        <div className="space-y-3">
-                                            <p className="text-xs text-text-secondary leading-relaxed mb-4">
-                                                The following dynamic variables were detected in this prompt. Replace them before executing.
-                                            </p>
-                                            {variables.map((v, i) => (
-                                                <div key={i} className="bg-bg-main p-3 rounded-sm border border-border-dark space-y-2 group focus-within:border-primary transition-colors">
-                                                    <div className="flex justify-between items-center">
-                                                        <span className="font-mono text-[10px] text-primary font-bold uppercase tracking-tight">[[{v}]]</span>
-                                                        {variableValues[v] && (
-                                                            <span className="text-[10px] text-text-muted font-mono uppercase">Filled</span>
-                                                        )}
-                                                    </div>
-                                                    <input
-                                                        placeholder={`Enter value...`}
-                                                        value={variableValues[v] || ''}
-                                                        onChange={(e) => setVariableValues({ ...variableValues, [v]: e.target.value })}
-                                                        className="w-full bg-black/40 border-none outline-none text-xs p-2 rounded-sm text-text-primary placeholder:text-text-muted/50 font-mono focus:bg-black/60 transition-all"
-                                                    />
-                                                </div>
-                                            ))}
-                                        </div>
-                                    ) : (
-                                        <div className="text-center p-6 border border-dashed border-border-dark rounded-sm">
-                                            <p className="text-xs text-text-muted font-mono uppercase tracking-widest">No variables detected.</p>
-                                        </div>
-                                    )}
-                                </div>
-
-                                {protocol.usageNotes && (
-                                    <div>
-                                        <h3 className="font-mono text-[10px] uppercase tracking-widest text-text-secondary flex items-center gap-2 border-b border-border-dark pb-2 mb-4">
-                                            Usage Notes
-                                        </h3>
-                                        <p className="text-xs text-text-primary leading-relaxed">
-                                            {protocol.usageNotes}
-                                        </p>
+                                <p className="text-[10px] text-text-muted leading-relaxed uppercase font-mono">
+                                    Fill the fields below to populate the prompt.
+                                </p>
+                                {variables.map((v, i) => (
+                                    <div key={i} className="space-y-2">
+                                        <label className="font-mono text-[10px] text-text-muted uppercase tracking-tight block">
+                                            [[{v}]]
+                                        </label>
+                                        <input
+                                            placeholder={`Enter value...`}
+                                            value={variableValues[v] || ''}
+                                            onChange={(e) => setVariableValues({ ...variableValues, [v]: e.target.value })}
+                                            className="w-full bg-background border border-border-dark outline-none text-xs p-3 rounded-sm text-text-primary placeholder:text-text-muted/30 font-mono focus:border-primary transition-all"
+                                        />
                                     </div>
-                                )}
+                                ))}
                             </div>
-                        </div>
-                    </div>
-                </motion.div>
+                        ) : (
+                            <div className="text-center py-10 px-4 border border-dashed border-border-dark rounded-sm">
+                                <p className="text-[10px] text-text-muted font-mono uppercase tracking-widest leading-relaxed">
+                                    No dynamic variables found in this prompt.
+                                </p>
+                            </div>
+                        )}
+                    </section>
+
+                    {protocol.usageNotes && (
+                        <section className="space-y-4">
+                            <h4 className="font-mono text-[10px] uppercase tracking-widest text-text-muted border-b border-border-dark pb-2">
+                                USAGE NOTES
+                            </h4>
+                            <p className="text-xs text-text-muted leading-relaxed font-mono italic">
+                                "{protocol.usageNotes}"
+                            </p>
+                        </section>
+                    )}
+                </div>
             </div>
-        </AnimatePresence>
+        </Modal>
     );
 }
+

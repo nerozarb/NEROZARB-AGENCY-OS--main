@@ -6,6 +6,7 @@ import { Button } from '../../components/ui/Button';
 import { SectionHeader } from '../../components/ui/SectionHeader';
 import { Tag } from '../../components/ui/Tag';
 import { Plus, Search, Filter, ArrowUpDown, Trash2, Archive, CheckCircle2, ChevronRight, Square, CheckSquare, Edit2 } from 'lucide-react';
+import { Modal } from '../../components/ui/Modal';
 import { useAppData } from '../../contexts/AppDataContext';
 import { Client } from '../../utils/storage';
 import { formatCurrency } from '../../utils/formatCurrency';
@@ -430,46 +431,62 @@ export default function RosterView({ onSelectClient }: { onSelectClient: (id: st
       )}
 
       {/* Delete Confirmation Modal */}
-      <AnimatePresence>
-        {clientToDelete && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
+      <Modal
+        isOpen={!!clientToDelete}
+        onClose={() => setClientToDelete(null)}
+        title={
+          <h2 className="font-heading text-xl text-red-500 uppercase tracking-tight">Confirm Deletion</h2>
+        }
+        footer={
+          <div className="flex flex-col sm:flex-row justify-end gap-3 w-full">
+            <Button
+              variant="ghost"
               onClick={() => setClientToDelete(null)}
-              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-            />
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="w-full max-w-md bg-surface border border-red-500/50 shadow-2xl relative z-10 p-6"
+              className="font-mono text-[10px] uppercase tracking-widest w-full sm:w-auto h-11"
             >
-              <h2 className="font-heading font-black text-xl text-red-500 uppercase mb-4">Confirm Deletion</h2>
-              <p className="text-sm text-text-secondary mb-4">
-                Are you sure you want to delete <strong className="text-text-primary">{clientToDelete.name}</strong>?
-                This action cannot be undone.
-              </p>
-              <div className="bg-card-alt p-4 border border-red-500/20 mb-6">
-                <p className="text-xs text-red-400 font-mono uppercase tracking-wider mb-2">This will also delete logically bound assets:</p>
-                <ul className="text-xs text-text-muted space-y-1 list-disc list-inside">
-                  <li>{data.tasks.filter(t => t.clientId === clientToDelete.id).length} Active/Completed Tasks</li>
-                  <li>{data.posts.filter(p => p.clientId === clientToDelete.id).length} Content Posts</li>
-                  <li>{data.protocols.filter(p => p.clientId === clientToDelete.id).length} Knowledge Vault Protocols</li>
-                </ul>
-              </div>
-              <div className="flex justify-end gap-3">
-                <Button variant="outline" onClick={() => setClientToDelete(null)}>CANCEL</Button>
-                <Button className="bg-red-500 hover:bg-red-600 text-text-primary px-6" onClick={() => {
+              ABORT MISSION
+            </Button>
+            <Button
+              className="bg-red-500 hover:bg-red-600 text-text-primary px-8 font-mono text-[10px] uppercase tracking-widest w-full sm:w-auto h-11"
+              onClick={() => {
+                if (clientToDelete) {
                   deleteClient(clientToDelete.id);
                   setClientToDelete(null);
-                }}>CONFIRM DELETE</Button>
-              </div>
-            </motion.div>
+                }
+              }}
+            >
+              TERMINATE RECORD
+            </Button>
+          </div>
+        }
+      >
+        {clientToDelete && (
+          <div className="space-y-6 py-2">
+            <p className="text-sm text-text-secondary leading-relaxed font-mono uppercase">
+              Are you sure you want to delete <strong className="text-red-500">{clientToDelete.name.toUpperCase()}</strong>?
+              <br />
+              <span className="text-xs opacity-70">This action is irreversible and will permanentely purge all associated data.</span>
+            </p>
+            <div className="bg-red-500/5 border border-red-500/20 p-4 rounded-sm">
+              <p className="text-[10px] text-red-400 font-mono uppercase tracking-widest mb-3 border-b border-red-500/20 pb-2">Logical Cascade Deletion Chain:</p>
+              <ul className="text-[10px] text-text-muted space-y-2 list-none font-mono uppercase">
+                <li className="flex justify-between">
+                  <span>Active/Completed Tasks</span>
+                  <span className="text-red-500">[{data.tasks.filter(t => t.clientId === clientToDelete.id).length}]</span>
+                </li>
+                <li className="flex justify-between">
+                  <span>Content Posts</span>
+                  <span className="text-red-500">[{data.posts.filter(p => p.clientId === clientToDelete.id).length}]</span>
+                </li>
+                <li className="flex justify-between">
+                  <span>Vault Protocols</span>
+                  <span className="text-red-500">[{data.protocols.filter(p => p.clientId === clientToDelete.id).length}]</span>
+                </li>
+              </ul>
+            </div>
           </div>
         )}
-      </AnimatePresence>
+      </Modal>
     </motion.div>
   );
 }

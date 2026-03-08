@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
-import { X, Save, Image as ImageIcon, Video, AlignLeft, LayoutPanelLeft, ListPlus } from 'lucide-react';
+import { Modal } from '../../components/ui/Modal';
+import { Save } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { useAppData } from '../../contexts/AppDataContext';
 import { Platform, PostType, TemplateType, CTAType, PostStage, NodeRole } from '../../utils/storage';
@@ -59,15 +59,6 @@ export default function NewPostModal({ isOpen, onClose, post, prefilledDate }: N
     const [linkedPromptId, setLinkedPromptId] = useState<number | ''>('');
     const [assetLinks, setAssetLinks] = useState('');
     const [referencePost, setReferencePost] = useState('');
-
-    // Hydration effect
-    useEffect(() => {
-        const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.key === 'Escape' && isOpen) onClose();
-        };
-        window.addEventListener('keydown', handleKeyDown);
-        return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [isOpen, onClose]);
 
     useEffect(() => {
         if (isOpen) {
@@ -145,313 +136,283 @@ export default function NewPostModal({ isOpen, onClose, post, prefilledDate }: N
     };
 
     return (
-        <AnimatePresence>
-            {isOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        onClick={onClose}
-                        className="absolute inset-0 bg-background/80 backdrop-blur-sm"
-                    />
-
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                        className="relative w-full max-w-4xl max-h-[90vh] bg-card  rounded-sm shadow-2xl overflow-hidden flex flex-col"
-                    >
-                        {/* Header */}
-                        <div className="p-6 border-b border-border-dark flex justify-between items-center bg-card-alt shrink-0">
-                            <div>
-                                <h3 className="font-heading text-2xl text-text-primary tracking-tight uppercase">
-                                    [ NEW POST ] — CONTENT ENGINE
-                                </h3>
-                            </div>
-                            <button
-                                onClick={onClose}
-                                className="p-2 text-text-muted hover:text-text-primary transition-colors"
-                            >
-                                <X size={20} />
-                            </button>
-                        </div>
-
-                        {/* Content (Scrollable) */}
-                        <div className="p-8 overflow-y-auto flex-1 space-y-10 custom-scrollbar min-h-0">
-
-                            {/* SECTION 1: IDENTIFICATION */}
-                            <section className="space-y-6">
-                                <h4 className="font-mono text-sm tracking-widest text-text-primary border-b border-border-dark pb-2">SECTION 1: IDENTIFICATION</h4>
-                                <div className="grid grid-cols-2 gap-6">
-                                    <div className="space-y-2">
-                                        <label className="text-xs font-mono text-text-muted uppercase">Client *</label>
-                                        <select
-                                            value={clientId}
-                                            onChange={(e) => setClientId(e.target.value === '' ? '' : Number(e.target.value))}
-                                            className="w-full bg-background  rounded-sm p-3 text-sm text-text-primary focus:border-primary outline-none"
-                                            required
-                                        >
-                                            <option value="">Select a client...</option>
-                                            {clients.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-                                        </select>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className="text-xs font-mono text-text-muted uppercase">Platform(s)</label>
-                                        <div className="flex flex-wrap gap-2">
-                                            {PLATFORMS.map(p => (
-                                                <button
-                                                    key={p.id}
-                                                    onClick={() => togglePlatform(p.id)}
-                                                    className={`px-3 py-1.5 text-xs rounded-sm border transition-colors ${platforms.includes(p.id) ? 'bg-primary/20 border-primary text-primary' : 'bg-background border-border-dark text-text-muted hover:border-text-muted'}`}
-                                                >
-                                                    {p.label}
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="grid grid-cols-3 gap-6">
-                                    <div className="space-y-2">
-                                        <label className="text-xs font-mono text-text-muted uppercase">Post Type *</label>
-                                        <select
-                                            value={postType}
-                                            onChange={(e) => setPostType(e.target.value as PostType)}
-                                            className="w-full bg-background  rounded-sm p-3 text-sm text-text-primary focus:border-primary outline-none"
-                                        >
-                                            {POST_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
-                                        </select>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className="text-xs font-mono text-text-muted uppercase">Content Pillar</label>
-                                        <select
-                                            value={contentPillar}
-                                            onChange={(e) => setContentPillar(e.target.value)}
-                                            className="w-full bg-background  rounded-sm p-3 text-sm text-text-primary focus:border-primary outline-none"
-                                        >
-                                            {clientId === '' && <option value="">Select client first</option>}
-                                            {selectedClientPillars.map(pillar => <option key={pillar} value={pillar}>{pillar}</option>)}
-                                            <option value="Other">Other</option>
-                                        </select>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className="text-xs font-mono text-text-muted uppercase">Template Type</label>
-                                        <select
-                                            value={templateType}
-                                            onChange={(e) => setTemplateType(e.target.value as TemplateType)}
-                                            className="w-full bg-background  rounded-sm p-3 text-sm text-text-primary focus:border-primary outline-none"
-                                        >
-                                            {TEMPLATES.map(t => <option key={t} value={t}>{t}</option>)}
-                                        </select>
-                                    </div>
-                                </div>
-                            </section>
-
-                            {/* SECTION 2: CONTENT */}
-                            <section className="space-y-6">
-                                <h4 className="font-mono text-sm tracking-widest text-text-primary border-b border-border-dark pb-2">SECTION 2: CONTENT</h4>
-
-                                <div className="space-y-2">
-                                    <label className="text-xs font-mono text-text-muted uppercase">HOOK — First line only</label>
-                                    <textarea
-                                        value={hook}
-                                        onChange={(e) => setHook(e.target.value)}
-                                        placeholder="THE ONE LINE THAT STOPS THE SCROLL..."
-                                        className="w-full bg-background  rounded-sm p-3 text-sm text-text-primary focus:border-primary outline-none resize-none font-bold"
-                                        rows={2}
-                                    />
-                                    <div className="flex gap-2 pt-1 overflow-x-auto pb-2">
-                                        {PSYCH_TRIGGERS.map(t => (
-                                            <button
-                                                key={t}
-                                                onClick={() => handlePsychTrigger(t)}
-                                                className="shrink-0 px-2 py-0.5 text-[10px] uppercase tracking-wider font-mono bg-card-alt  text-text-muted rounded-sm hover:text-primary transition-colors"
-                                            >
-                                                [ {t} ]
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                <div className="space-y-2">
-                                    <label className="text-xs font-mono text-text-muted uppercase">BODY COPY</label>
-                                    <textarea
-                                        value={captionBody}
-                                        onChange={(e) => setCaptionBody(e.target.value)}
-                                        placeholder="2–4 sentences. What they realize. What they learn. First person but brand-first."
-                                        className="w-full bg-background  rounded-sm p-3 text-sm text-text-primary focus:border-primary outline-none resize-none"
-                                        rows={4}
-                                    />
-                                </div>
-
-                                <div className="grid grid-cols-2 gap-6">
-                                    <div className="space-y-2">
-                                        <label className="text-xs font-mono text-text-muted uppercase">Call To Action</label>
-                                        <select
-                                            value={ctaType}
-                                            onChange={(e) => setCtaType(e.target.value as CTAType)}
-                                            className="w-full bg-background  rounded-sm p-3 text-sm text-text-primary focus:border-primary outline-none"
-                                        >
-                                            {CTA_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
-                                        </select>
-                                        {ctaType === 'Custom' && (
-                                            <input
-                                                value={customCta}
-                                                onChange={e => setCustomCta(e.target.value)}
-                                                placeholder="Enter custom CTA phrasing..."
-                                                className="w-full bg-background  rounded-sm p-3 mt-2 text-sm text-text-primary focus:border-primary outline-none"
-                                            />
-                                        )}
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className="text-xs font-mono text-text-muted uppercase">Hashtags</label>
-                                        <textarea
-                                            value={hashtags}
-                                            onChange={(e) => setHashtags(e.target.value)}
-                                            placeholder="#nerozarb #digitalgrowth ... (8–12 max)"
-                                            className="w-full bg-background  rounded-sm p-3 text-sm text-text-primary focus:border-primary outline-none resize-none"
-                                            rows={2}
-                                        />
-                                    </div>
-                                </div>
-
-                                <div className="space-y-2">
-                                    <label className="text-xs font-mono text-text-muted uppercase flex justify-between">
-                                        <span>VISUAL BRIEF — FOR ART DIRECTOR / VIDEO EDITOR</span>
-                                        <span className="text-primary/70">{templateType} applied</span>
-                                    </label>
-                                    <textarea
-                                        value={visualBrief}
-                                        onChange={(e) => setVisualBrief(e.target.value)}
-                                        placeholder="Describe exactly what the visual should look like. Template used, key text, colors, elements, mood..."
-                                        className="w-full bg-background border border-primary/30 rounded-sm p-3 text-sm text-text-primary focus:border-primary outline-none resize-none"
-                                        rows={3}
-                                    />
-                                </div>
-                            </section>
-
-                            {/* SECTION 3, 4, 5 */}
-                            <div className="grid grid-cols-2 gap-10">
-                                <section className="space-y-6">
-                                    <h4 className="font-mono text-sm tracking-widest text-text-primary border-b border-border-dark pb-2">SECTION 3: SCHEDULING</h4>
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div className="space-y-2">
-                                            <label className="text-xs font-mono text-text-muted uppercase">Date *</label>
-                                            <input
-                                                type="date"
-                                                value={scheduledDate}
-                                                onChange={(e) => setScheduledDate(e.target.value)}
-                                                className="w-full bg-background  rounded-sm p-3 text-sm text-text-primary focus:border-primary outline-none"
-                                                required
-                                            />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <label className="text-xs font-mono text-text-muted uppercase">Time</label>
-                                            <input
-                                                type="time"
-                                                value={scheduledTime}
-                                                onChange={(e) => setScheduledTime(e.target.value)}
-                                                className="w-full bg-background  rounded-sm p-3 text-sm text-text-primary focus:border-primary outline-none"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div className="space-y-2">
-                                            <label className="text-xs font-mono text-text-muted uppercase">Priority</label>
-                                            <select
-                                                value={priority}
-                                                onChange={(e) => setPriority(e.target.value as any)}
-                                                className="w-full bg-background  rounded-sm p-3 text-sm text-text-primary focus:border-primary outline-none"
-                                            >
-                                                <option value="normal">Normal</option>
-                                                <option value="high">High Priority</option>
-                                                <option value="urgent">URGENT</option>
-                                            </select>
-                                        </div>
-                                        <div className="space-y-2">
-                                            <label className="text-xs font-mono text-text-muted uppercase">Status</label>
-                                            <select
-                                                value={status}
-                                                onChange={(e) => setStatus(e.target.value as PostStage)}
-                                                className="w-full bg-background  rounded-sm p-3 text-sm text-text-primary focus:border-primary outline-none"
-                                            >
-                                                <option value="PLANNED">PLANNED</option>
-                                                <option value="BRIEF WRITTEN">BRIEF WRITTEN</option>
-                                                <option value="IN PRODUCTION">IN PRODUCTION</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </section>
-
-                                <section className="space-y-6">
-                                    <h4 className="font-mono text-sm tracking-widest text-text-primary border-b border-border-dark pb-2">ASSIGNMENT & ASSETS</h4>
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div className="space-y-2">
-                                            <label className="text-xs font-mono text-text-muted uppercase">Assigned To</label>
-                                            <select
-                                                value={assignedTo}
-                                                onChange={(e) => setAssignedTo(e.target.value as NodeRole)}
-                                                className="w-full bg-background  rounded-sm p-3 text-sm text-text-primary focus:border-primary outline-none"
-                                            >
-                                                <option value="Art Director">Art Director</option>
-                                                <option value="Video Editor">Video Editor</option>
-                                                <option value="Social Media Manager">Social Media Manager</option>
-                                            </select>
-                                        </div>
-                                        <div className="space-y-2">
-                                            <label className="text-xs font-mono text-text-muted uppercase">Link to Task</label>
-                                            <select
-                                                value={linkedTaskId}
-                                                onChange={(e) => setLinkedTaskId(e.target.value === '' ? '' : Number(e.target.value))}
-                                                className="w-full bg-background  rounded-sm p-3 text-sm text-text-primary focus:border-primary outline-none"
-                                            >
-                                                <option value="">None</option>
-                                                {data.tasks.filter(t => t.status === 'active').map(t => (
-                                                    <option key={t.id} value={t.id}>{t.name}</option>
-                                                ))}
-                                            </select>
-                                        </div>
-                                        <div className="space-y-2">
-                                            <label className="text-xs font-mono text-text-muted uppercase">Linked Prompt</label>
-                                            <select
-                                                value={linkedPromptId}
-                                                onChange={(e) => setLinkedPromptId(e.target.value === '' ? '' : Number(e.target.value))}
-                                                className="w-full bg-background  rounded-sm p-3 text-sm text-text-primary focus:border-primary outline-none"
-                                            >
-                                                <option value="">None</option>
-                                                {data.protocols.filter(p => p.category === 'ai-prompt').map(p => (
-                                                    <option key={p.id} value={p.id}>{p.title}</option>
-                                                ))}
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className="text-xs font-mono text-text-muted uppercase">Asset Links</label>
-                                        <input
-                                            value={assetLinks}
-                                            onChange={(e) => setAssetLinks(e.target.value)}
-                                            placeholder="Link to Canva file, Drive folder..."
-                                            className="w-full bg-background  rounded-sm p-3 text-sm text-text-primary focus:border-primary outline-none"
-                                        />
-                                    </div>
-                                </section>
-                            </div>
-
-                        </div>
-
-                        {/* Footer */}
-                        <div className="p-6 border-t border-border-dark flex justify-between bg-card-alt shrink-0">
-                            <Button variant="ghost" onClick={onClose}>CANCEL</Button>
-                            <Button onClick={handleSubmit} disabled={clientId === '' || !scheduledDate}>
-                                <Save size={16} />
-                                CREATE POST
-                            </Button>
-                        </div>
-
-                    </motion.div>
+        <Modal
+            isOpen={isOpen}
+            onClose={onClose}
+            title="New Post — Content Engine"
+            width={900}
+            footer={
+                <div className="flex justify-between items-center w-full">
+                    <Button variant="ghost" onClick={onClose} className="text-text-muted hover:text-text-primary">
+                        CANCEL
+                    </Button>
+                    <Button onClick={handleSubmit} disabled={clientId === '' || !scheduledDate} className="bg-primary hover:bg-accent-mid text-text-primary px-8">
+                        <Save size={16} className="mr-2" />
+                        CREATE POST
+                    </Button>
                 </div>
-            )}
-        </AnimatePresence>
+            }
+        >
+            <div className="space-y-10 py-2">
+                {/* SECTION 1: IDENTIFICATION */}
+                <section className="space-y-6">
+                    <h4 className="font-mono text-sm tracking-widest text-text-primary border-b border-border-dark pb-2">SECTION 1: IDENTIFICATION</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-2">
+                            <label className="text-xs font-mono text-text-muted uppercase">Client *</label>
+                            <select
+                                value={clientId}
+                                onChange={(e) => setClientId(e.target.value === '' ? '' : Number(e.target.value))}
+                                className="w-full bg-background border border-border-dark rounded-sm p-3 text-sm text-text-primary focus:border-primary outline-none"
+                                required
+                            >
+                                <option value="">Select a client...</option>
+                                {clients.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                            </select>
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-xs font-mono text-text-muted uppercase">Platform(s)</label>
+                            <div className="flex flex-wrap gap-2">
+                                {PLATFORMS.map(p => (
+                                    <button
+                                        key={p.id}
+                                        onClick={() => togglePlatform(p.id)}
+                                        className={`px-3 py-1.5 text-xs rounded-sm border transition-colors ${platforms.includes(p.id) ? 'bg-primary/20 border-primary text-primary font-bold' : 'bg-background border-border-dark text-text-muted hover:border-text-muted'}`}
+                                    >
+                                        {p.label}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                        <div className="space-y-2">
+                            <label className="text-xs font-mono text-text-muted uppercase">Post Type *</label>
+                            <select
+                                value={postType}
+                                onChange={(e) => setPostType(e.target.value as PostType)}
+                                className="w-full bg-background border border-border-dark rounded-sm p-3 text-sm text-text-primary focus:border-primary outline-none"
+                            >
+                                {POST_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+                            </select>
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-xs font-mono text-text-muted uppercase">Content Pillar</label>
+                            <select
+                                value={contentPillar}
+                                onChange={(e) => setContentPillar(e.target.value)}
+                                className="w-full bg-background border border-border-dark rounded-sm p-3 text-sm text-text-primary focus:border-primary outline-none"
+                            >
+                                {clientId === '' && <option value="">Select client first</option>}
+                                {selectedClientPillars.map(pillar => <option key={pillar} value={pillar}>{pillar}</option>)}
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-xs font-mono text-text-muted uppercase">Template Type</label>
+                            <select
+                                value={templateType}
+                                onChange={(e) => setTemplateType(e.target.value as TemplateType)}
+                                className="w-full bg-background border border-border-dark rounded-sm p-3 text-sm text-text-primary focus:border-primary outline-none"
+                            >
+                                {TEMPLATES.map(t => <option key={t} value={t}>{t}</option>)}
+                            </select>
+                        </div>
+                    </div>
+                </section>
+
+                {/* SECTION 2: CONTENT */}
+                <section className="space-y-6">
+                    <h4 className="font-mono text-sm tracking-widest text-text-primary border-b border-border-dark pb-2">SECTION 2: CONTENT</h4>
+
+                    <div className="space-y-2">
+                        <label className="text-xs font-mono text-text-muted uppercase">HOOK — First line only</label>
+                        <textarea
+                            value={hook}
+                            onChange={(e) => setHook(e.target.value)}
+                            placeholder="THE ONE LINE THAT STOPS THE SCROLL..."
+                            className="w-full bg-background border border-border-dark rounded-sm p-3 text-sm text-text-primary focus:border-primary outline-none resize-none font-bold min-h-[60px]"
+                            rows={2}
+                        />
+                        <div className="flex gap-2 pt-1 overflow-x-auto pb-2 scrollbar-none">
+                            {PSYCH_TRIGGERS.map(t => (
+                                <button
+                                    key={t}
+                                    onClick={() => handlePsychTrigger(t)}
+                                    className="shrink-0 px-2 py-0.5 text-[10px] uppercase tracking-wider font-mono bg-surface border border-border-dark text-text-muted rounded-sm hover:text-primary hover:border-primary transition-colors"
+                                >
+                                    [ {t} ]
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="space-y-2">
+                        <label className="text-xs font-mono text-text-muted uppercase">BODY COPY</label>
+                        <textarea
+                            value={captionBody}
+                            onChange={(e) => setCaptionBody(e.target.value)}
+                            placeholder="2–4 sentences. What they realize. What they learn. First person but brand-first."
+                            className="w-full bg-background border border-border-dark rounded-sm p-3 text-sm text-text-primary focus:border-primary outline-none resize-none min-h-[100px]"
+                            rows={4}
+                        />
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-2">
+                            <label className="text-xs font-mono text-text-muted uppercase">Call To Action</label>
+                            <select
+                                value={ctaType}
+                                onChange={(e) => setCtaType(e.target.value as CTAType)}
+                                className="w-full bg-background border border-border-dark rounded-sm p-3 text-sm text-text-primary focus:border-primary outline-none"
+                            >
+                                {CTA_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+                            </select>
+                            {ctaType === 'Custom' && (
+                                <input
+                                    value={customCta}
+                                    onChange={e => setCustomCta(e.target.value)}
+                                    placeholder="Enter custom CTA phrasing..."
+                                    className="w-full bg-background border border-border-dark rounded-sm p-3 mt-2 text-sm text-text-primary focus:border-primary outline-none"
+                                />
+                            )}
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-xs font-mono text-text-muted uppercase">Hashtags</label>
+                            <textarea
+                                value={hashtags}
+                                onChange={(e) => setHashtags(e.target.value)}
+                                placeholder="#nerozarb #digitalgrowth ... (8–12 max)"
+                                className="w-full bg-background border border-border-dark rounded-sm p-3 text-sm text-text-primary focus:border-primary outline-none resize-none min-h-[80px]"
+                                rows={2}
+                            />
+                        </div>
+                    </div>
+
+                    <div className="space-y-2">
+                        <label className="text-xs font-mono text-text-muted uppercase flex justify-between">
+                            <span>VISUAL BRIEF — FOR ART DIRECTOR / VIDEO EDITOR</span>
+                            <span className="text-primary/70">{templateType} applied</span>
+                        </label>
+                        <textarea
+                            value={visualBrief}
+                            onChange={(e) => setVisualBrief(e.target.value)}
+                            placeholder="Describe exactly what the visual should look like. Template used, key text, colors, elements, mood..."
+                            className="w-full bg-background border border-primary/30 rounded-sm p-3 text-sm text-text-primary focus:border-primary outline-none resize-none min-h-[100px]"
+                            rows={3}
+                        />
+                    </div>
+                </section>
+
+                {/* SECTION 3, 4, 5 */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                    <section className="space-y-6">
+                        <h4 className="font-mono text-sm tracking-widest text-text-primary border-b border-border-dark pb-2">SECTION 3: SCHEDULING</h4>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <label className="text-xs font-mono text-text-muted uppercase">Date *</label>
+                                <input
+                                    type="date"
+                                    value={scheduledDate}
+                                    onChange={(e) => setScheduledDate(e.target.value)}
+                                    className="w-full bg-background border border-border-dark rounded-sm p-3 text-sm text-text-primary focus:border-primary outline-none"
+                                    required
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-xs font-mono text-text-muted uppercase">Time</label>
+                                <input
+                                    type="time"
+                                    value={scheduledTime}
+                                    onChange={(e) => setScheduledTime(e.target.value)}
+                                    className="w-full bg-background border border-border-dark rounded-sm p-3 text-sm text-text-primary focus:border-primary outline-none"
+                                />
+                            </div>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <label className="text-xs font-mono text-text-muted uppercase">Priority</label>
+                                <select
+                                    value={priority}
+                                    onChange={(e) => setPriority(e.target.value as any)}
+                                    className="w-full bg-background border border-border-dark rounded-sm p-3 text-sm text-text-primary focus:border-primary outline-none"
+                                >
+                                    <option value="normal">Normal</option>
+                                    <option value="high">High Priority</option>
+                                    <option value="urgent">URGENT</option>
+                                </select>
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-xs font-mono text-text-muted uppercase">Status</label>
+                                <select
+                                    value={status}
+                                    onChange={(e) => setStatus(e.target.value as PostStage)}
+                                    className="w-full bg-background border border-border-dark rounded-sm p-3 text-sm text-text-primary focus:border-primary outline-none"
+                                >
+                                    <option value="PLANNED">PLANNED</option>
+                                    <option value="BRIEF WRITTEN">BRIEF WRITTEN</option>
+                                    <option value="IN PRODUCTION">IN PRODUCTION</option>
+                                </select>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section className="space-y-6">
+                        <h4 className="font-mono text-sm tracking-widest text-text-primary border-b border-border-dark pb-2">ASSIGNMENT & ASSETS</h4>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <label className="text-xs font-mono text-text-muted uppercase">Assigned To</label>
+                                <select
+                                    value={assignedTo}
+                                    onChange={(e) => setAssignedTo(e.target.value as NodeRole)}
+                                    className="w-full bg-background border border-border-dark rounded-sm p-3 text-sm text-text-primary focus:border-primary outline-none"
+                                >
+                                    <option value="Art Director">Art Director</option>
+                                    <option value="Video Editor">Video Editor</option>
+                                    <option value="Social Media Manager">Social Media Manager</option>
+                                </select>
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-xs font-mono text-text-muted uppercase">Link to Task</label>
+                                <select
+                                    value={linkedTaskId}
+                                    onChange={(e) => setLinkedTaskId(e.target.value === '' ? '' : Number(e.target.value))}
+                                    className="w-full bg-background border border-border-dark rounded-sm p-3 text-sm text-text-primary focus:border-primary outline-none"
+                                >
+                                    <option value="">None</option>
+                                    {data.tasks.filter(t => t.status === 'active').map(t => (
+                                        <option key={t.id} value={t.id}>{t.name}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="space-y-2 sm:col-span-2">
+                                <label className="text-xs font-mono text-text-muted uppercase">Linked Prompt</label>
+                                <select
+                                    value={linkedPromptId}
+                                    onChange={(e) => setLinkedPromptId(e.target.value === '' ? '' : Number(e.target.value))}
+                                    className="w-full bg-background border border-border-dark rounded-sm p-3 text-sm text-text-primary focus:border-primary outline-none"
+                                >
+                                    <option value="">None</option>
+                                    {data.protocols.filter(p => p.category === 'ai-prompt').map(p => (
+                                        <option key={p.id} value={p.id}>{p.title}</option>
+                                    ))}
+                                </select>
+                            </div>
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-xs font-mono text-text-muted uppercase">Asset Links</label>
+                            <input
+                                value={assetLinks}
+                                onChange={(e) => setAssetLinks(e.target.value)}
+                                placeholder="Link to Canva file, Drive folder..."
+                                className="w-full bg-background border border-border-dark rounded-sm p-3 text-sm text-text-primary focus:border-primary outline-none"
+                            />
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </Modal>
     );
 }
+

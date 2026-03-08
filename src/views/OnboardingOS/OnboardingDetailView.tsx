@@ -8,6 +8,7 @@ import {
     Clock, Shield, Users, Zap, AlertTriangle, PartyPopper
 } from 'lucide-react';
 import { useAppData } from '../../contexts/AppDataContext';
+import { Modal } from '../../components/ui/Modal';
 import { OnboardingProtocol } from '../../utils/storage';
 import { formatDistanceToNow } from 'date-fns';
 
@@ -149,10 +150,10 @@ export default function OnboardingDetailView({ protocol, onBack, onNavigate }: O
                         <div
                             key={step.id}
                             className={`flex-1 rounded-[2px] transition-all duration-500 ${step.completed
-                                    ? 'bg-primary shadow-[0_0_8px_rgba(63,106,36,0.4)]'
-                                    : i === completedCount
-                                        ? 'bg-primary/30 animate-pulse'
-                                        : 'bg-border-dark/50'
+                                ? 'bg-primary shadow-[0_0_8px_rgba(63,106,36,0.4)]'
+                                : i === completedCount
+                                    ? 'bg-primary/30 animate-pulse'
+                                    : 'bg-border-dark/50'
                                 }`}
                         />
                     ))}
@@ -205,10 +206,10 @@ export default function OnboardingDetailView({ protocol, onBack, onNavigate }: O
                             key={step.id}
                             layout
                             className={`border rounded-sm transition-all ${step.completed
-                                    ? 'border-primary/20 bg-primary/5'
-                                    : isNextStep
-                                        ? 'border-primary/40 bg-card-alt/50 shadow-[0_0_12px_rgba(63,106,36,0.1)]'
-                                        : 'border-border-dark bg-card'
+                                ? 'border-primary/20 bg-primary/5'
+                                : isNextStep
+                                    ? 'border-primary/40 bg-card-alt/50 shadow-[0_0_12px_rgba(63,106,36,0.1)]'
+                                    : 'border-border-dark bg-card'
                                 }`}
                         >
                             {/* Step Header */}
@@ -218,10 +219,10 @@ export default function OnboardingDetailView({ protocol, onBack, onNavigate }: O
                             >
                                 {/* Step Number */}
                                 <div className={`w-8 h-8 rounded-full flex items-center justify-center font-mono text-xs font-bold shrink-0 ${step.completed
-                                        ? 'bg-primary/20 text-primary'
-                                        : isNextStep
-                                            ? 'bg-primary/10 text-primary border border-primary/30'
-                                            : 'bg-card-alt text-text-muted '
+                                    ? 'bg-primary/20 text-primary'
+                                    : isNextStep
+                                        ? 'bg-primary/10 text-primary border border-primary/30'
+                                        : 'bg-card-alt text-text-muted '
                                     }`}>
                                     {String(index + 1).padStart(2, '0')}
                                 </div>
@@ -244,8 +245,8 @@ export default function OnboardingDetailView({ protocol, onBack, onNavigate }: O
 
                                 {/* Owner Badge */}
                                 <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-sm text-[9px] font-mono uppercase tracking-widest ${step.owner === 'CEO'
-                                        ? 'bg-yellow-500/10 text-yellow-500 border border-yellow-500/20'
-                                        : 'bg-card-alt text-text-muted '
+                                    ? 'bg-yellow-500/10 text-yellow-500 border border-yellow-500/20'
+                                    : 'bg-card-alt text-text-muted '
                                     }`}>
                                     {step.owner === 'CEO' ? <Shield size={10} /> : <Users size={10} />}
                                     {step.owner}
@@ -305,10 +306,10 @@ export default function OnboardingDetailView({ protocol, onBack, onNavigate }: O
                                                     <Button
                                                         variant={step.completed ? 'outline' : 'default'}
                                                         className={`text-[10px] ${isCeoGated
-                                                                ? 'opacity-50 cursor-not-allowed'
-                                                                : step.completed
-                                                                    ? 'border-border-dark hover:border-red-500 hover:text-red-500'
-                                                                    : 'bg-primary hover:bg-accent-mid'
+                                                            ? 'opacity-50 cursor-not-allowed'
+                                                            : step.completed
+                                                                ? 'border-border-dark hover:border-red-500 hover:text-red-500'
+                                                                : 'bg-primary hover:bg-accent-mid'
                                                             }`}
                                                         onClick={(e) => {
                                                             e.stopPropagation();
@@ -339,48 +340,49 @@ export default function OnboardingDetailView({ protocol, onBack, onNavigate }: O
             </div>
 
             {/* Sprint Generation Prompt Modal */}
-            <AnimatePresence>
-                {showSprintPrompt && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            onClick={() => setShowSprintPrompt(false)}
-                            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-                        />
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.95 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            exit={{ opacity: 0, scale: 0.95 }}
-                            className="w-full max-w-md bg-surface border border-primary/50 shadow-2xl relative z-10 p-6"
-                        >
-                            <div className="flex items-center gap-3 mb-4">
-                                <PartyPopper size={24} className="text-primary" />
-                                <h2 className="font-heading font-black text-xl text-primary uppercase">Onboarding Complete!</h2>
-                            </div>
-                            <p className="text-sm text-text-secondary mb-6">
-                                All 10 onboarding steps are complete for <strong className="text-text-primary">{client.name}</strong>.
-                                Would you like to generate the standard Phase 1 Sprint Tasks now?
-                            </p>
-                            <div className="flex justify-end gap-3">
-                                <Button variant="outline" onClick={() => setShowSprintPrompt(false)}>LATER</Button>
-                                <Button
-                                    className="bg-primary hover:bg-accent-mid text-text-primary px-6"
-                                    onClick={() => {
-                                        generateSprintTasks(client.id);
-                                        setShowSprintPrompt(false);
-                                        onNavigate?.('fulfillment', client.id.toString());
-                                    }}
-                                >
-                                    <Zap size={14} />
-                                    GENERATE SPRINT
-                                </Button>
-                            </div>
-                        </motion.div>
+            <Modal
+                isOpen={showSprintPrompt}
+                onClose={() => setShowSprintPrompt(false)}
+                title={
+                    <div className="flex items-center gap-3">
+                        <PartyPopper className="w-6 h-6 text-primary" />
+                        <h2 className="font-heading text-xl text-text-primary uppercase tracking-tight">Onboarding Complete!</h2>
                     </div>
-                )}
-            </AnimatePresence>
+                }
+                footer={
+                    <div className="flex flex-col sm:flex-row justify-end gap-3 w-full">
+                        <Button
+                            variant="ghost"
+                            onClick={() => setShowSprintPrompt(false)}
+                            className="font-mono text-[10px] uppercase tracking-widest w-full sm:w-auto h-11"
+                        >
+                            LATER
+                        </Button>
+                        <Button
+                            className="bg-primary hover:bg-accent-mid text-text-primary px-8 font-mono text-[10px] uppercase tracking-widest w-full sm:w-auto h-11"
+                            onClick={() => {
+                                generateSprintTasks(client.id);
+                                setShowSprintPrompt(false);
+                                onNavigate?.('fulfillment', client.id.toString());
+                            }}
+                        >
+                            <Zap className="w-4 h-4 mr-2" />
+                            GENERATE SPRINT
+                        </Button>
+                    </div>
+                }
+            >
+                <div className="space-y-6 py-2">
+                    <p className="text-sm text-text-secondary leading-relaxed font-mono uppercase">
+                        All 10 onboarding steps are complete for <strong className="text-primary">{client.name.toUpperCase()}</strong>.
+                    </p>
+                    <div className="bg-primary/5 border border-primary/20 p-4 rounded-sm">
+                        <p className="text-[10px] text-text-muted leading-relaxed font-mono uppercase">
+                            EXECUTION READY: WOULD YOU LIKE TO INITIALIZE THE STANDARD PHASE 1 SPRINT TASKS AND DEPLOY TO FULFILLMENT OS?
+                        </p>
+                    </div>
+                </div>
+            </Modal>
         </motion.div>
     );
 }

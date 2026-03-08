@@ -17,7 +17,7 @@ function useEscapeKey(isOpen: boolean, onClose: () => void) {
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
-  title: string;
+  title: ReactNode;
   width?: number;
   footer?: ReactNode;
   children: ReactNode;
@@ -59,7 +59,9 @@ export function Modal({ isOpen, onClose, title, width = 500, footer, children }:
               <button onClick={onClose} className="text-text-muted hover:text-text-primary transition-colors tap-target">
                 <ArrowLeft size={20} />
               </button>
-              <h2 className="font-heading text-lg tracking-tighter text-text-primary capitalize flex-1">{title}</h2>
+              <div className="flex-1 min-w-0">
+                <h2 className="font-heading text-lg tracking-tighter text-text-primary capitalize truncate">{title}</h2>
+              </div>
             </div>
             <div className="p-5 overflow-y-auto custom-scrollbar scroll-touch flex-1 min-h-0">
               {children}
@@ -84,7 +86,7 @@ export function Modal({ isOpen, onClose, title, width = 500, footer, children }:
           >
             <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-primary/50 via-primary to-primary/50" />
             <div className="flex items-center justify-between p-6 border-b border-border-dark">
-              <h2 className="font-heading text-xl tracking-tighter text-text-primary capitalize">{title}</h2>
+              <h2 className="font-heading text-xl tracking-tighter text-text-primary capitalize flex-1">{title}</h2>
               <button onClick={onClose} className="text-text-muted hover:text-text-primary transition-colors hover:rotate-90 duration-300">
                 <X size={20} />
               </button>
@@ -103,3 +105,4 @@ export function Modal({ isOpen, onClose, title, width = 500, footer, children }:
     </AnimatePresence>
   );
 }
+
