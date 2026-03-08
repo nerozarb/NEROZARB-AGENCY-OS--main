@@ -6,6 +6,7 @@ import { loadData, saveData, AppData } from './utils/storage';
 import { AppDataProvider } from './contexts/AppDataContext';
 import { fetchAppDataFromSupabase, syncSettingsToSupabase } from './utils/supabaseSync';
 import { GlobalErrorBoundary } from './components/layout/GlobalErrorBoundary';
+import { supabase } from './lib/supabase';
 
 // Lazy-loaded view modules — only loaded when user navigates to them
 const DashboardView = lazy(() => import('./views/CommandCenter/DashboardView'));
@@ -36,6 +37,21 @@ export default function App() {
   useEffect(() => {
     async function hydrate() {
       setIsLoading(true);
+
+      // 1. Check Supabase Session First
+      const { data: { session } } = await supabase.auth.getSession();
+
+      if (session) {
+        // Auto-login based on session existence. In a real app we'd check claims.
+        // For now we trust the stored authLevel in sessionStorage as a UX preference, 
+        // but the backend is secured via Supabase RLS.
+        setAuthLevel((sessionStorage.getItem('authLevel') as 'ceo' | 'team') || 'ceo');
+      } else {
+        setAuthLevel(null);
+        sessionStorage.removeItem('authLevel');
+      }
+
+      // 2. Fetch App Data
       const cloudData = await fetchAppDataFromSupabase();
       if (cloudData) {
         setData(prev => ({
@@ -46,6 +62,19 @@ export default function App() {
       setIsLoading(false);
     }
     hydrate();
+
+    // 3. Listen for Auth Changes (Login / Logout across tabs)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session) {
+        // Keep current auth level if set during login process
+        setAuthLevel(prev => prev || 'ceo');
+      } else {
+        setAuthLevel(null);
+        sessionStorage.removeItem('authLevel');
+      }
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
   // Debounced save — prevents serializing entire state on every keystroke/click
@@ -99,7 +128,8 @@ export default function App() {
     setActiveView(level === 'ceo' ? 'command' : 'fulfillment');
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
     setAuthLevel(null);
     sessionStorage.removeItem('authLevel');
   };
@@ -128,8 +158,6 @@ export default function App() {
         <LoginView
           onLogin={handleLogin}
           onReset={handleReset}
-          ceoHash={data.settings.ceoPhraseHash || ''}
-          teamHash={data.settings.teamPhraseHash || ''}
         />
       </AppDataProvider>
     );

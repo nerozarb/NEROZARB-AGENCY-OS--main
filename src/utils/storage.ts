@@ -710,6 +710,8 @@ export const loadData = (): AppData => {
     }
 };
 
+import { syncTasksToSupabase, syncPostsToSupabase, syncSettingsToSupabase } from './supabaseSync';
+
 export const saveData = (data: AppData) => {
     const dataToSave = {
         ...data,
@@ -718,7 +720,16 @@ export const saveData = (data: AppData) => {
             lastUpdated: new Date().toISOString(),
         },
     };
+
+    // 1. Save locally for instant optimistic UI
     localStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave));
+
+    // 2. Sync to Supabase in the background
+    // Note: Clients, Protocols, and Onboardings are usually synced individually when edited to save bandwidth.
+    // We bulk-sync Tasks and Posts here since they change frequently via drag-and-drop.
+    syncTasksToSupabase(dataToSave.tasks);
+    syncPostsToSupabase(dataToSave.posts);
+    syncSettingsToSupabase(dataToSave.settings);
 };
 
 // Simple hash function for demo purposes (usually you'd use something more secure)

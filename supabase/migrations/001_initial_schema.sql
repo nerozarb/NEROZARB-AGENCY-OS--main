@@ -1,199 +1,143 @@
--- =====================================================
--- NEROZARB Agency OS — Supabase Database Schema
--- Run this SQL in the Supabase SQL Editor to create
--- all required tables for the Agency OS application.
--- =====================================================
+-- Create enum types to match TypeScript types
+CREATE TYPE client_status AS ENUM ('Lead', 'Discovery', 'Active Sprint', 'Retainer', 'Closed');
+CREATE TYPE relationship_health AS ENUM ('healthy', 'at-risk', 'critical');
+CREATE TYPE onboarding_status AS ENUM ('not-started', 'in-progress', 'complete');
+CREATE TYPE task_category AS ENUM ('Content Production', 'Ad Creative', 'Website', 'Strategy', 'Video Production', 'Brand Design', 'Analytics', 'Automation', 'Client Communication', 'Other');
+CREATE TYPE node_role AS ENUM ('CEO', 'Art Director', 'Video Editor', 'Operations Builder', 'Social Media Manager', 'Documentation Manager');
+CREATE TYPE task_stage AS ENUM ('BRIEFED', 'IN PRODUCTION', 'REVIEW', 'CEO APPROVAL', 'CLIENT APPROVAL', 'DEPLOYED');
+CREATE TYPE priority_level AS ENUM ('critical', 'high', 'normal', 'urgent');
+CREATE TYPE task_status AS ENUM ('active', 'deployed', 'cancelled');
+CREATE TYPE post_stage AS ENUM ('PLANNED', 'BRIEF WRITTEN', 'IN PRODUCTION', 'REVIEW', 'CEO APPROVAL', 'CLIENT APPROVAL', 'SCHEDULED', 'PUBLISHED');
+CREATE TYPE social_platform AS ENUM ('instagram', 'facebook', 'tiktok', 'linkedin', 'twitter');
+CREATE TYPE protocol_category AS ENUM ('sop', 'ai-prompt', 'client-knowledge-base', 'brand-standard');
+CREATE TYPE protocol_status AS ENUM ('active', 'draft', 'archived');
+CREATE TYPE activity_type AS ENUM ('stage_advance', 'stage_regress', 'note', 'created', 'edited');
 
--- Enable Row Level Security (RLS) will be set per table
-
--- =====================================================
--- 1. CLIENTS TABLE
--- =====================================================
-CREATE TABLE IF NOT EXISTS clients (
-    id BIGSERIAL PRIMARY KEY,
+-- Clients Table
+CREATE TABLE clients (
+    id SERIAL PRIMARY KEY,
     name TEXT NOT NULL,
-    status TEXT NOT NULL DEFAULT 'Lead'
-        CHECK (status IN ('Lead', 'Discovery', 'Active Sprint', 'Retainer', 'Closed')),
-    "revenueGate" TEXT NOT NULL DEFAULT '<1M PKR',
-    tier TEXT NOT NULL DEFAULT 'Tier 1: Active Presence',
-    ltv NUMERIC NOT NULL DEFAULT 0,
-    "contractValue" NUMERIC NOT NULL DEFAULT 0,
-    phone TEXT NOT NULL DEFAULT '',
-    email TEXT NOT NULL DEFAULT '',
-    "contactName" TEXT NOT NULL DEFAULT '',
-    niche TEXT NOT NULL DEFAULT '',
-    "startDate" TEXT NOT NULL DEFAULT '',
-    "shadowAvatar" TEXT NOT NULL DEFAULT '',
-    "bleedingNeck" TEXT NOT NULL DEFAULT '',
-    "contentPillars" JSONB NOT NULL DEFAULT '[]'::jsonb,
-    "relationshipHealth" TEXT NOT NULL DEFAULT 'healthy'
-        CHECK ("relationshipHealth" IN ('healthy', 'at-risk', 'critical')),
-    "onboardingStatus" TEXT NOT NULL DEFAULT 'not-started'
-        CHECK ("onboardingStatus" IN ('not-started', 'in-progress', 'complete')),
-    notes TEXT NOT NULL DEFAULT '',
-    timeline JSONB NOT NULL DEFAULT '[]'::jsonb,
-    "createdAt" TEXT NOT NULL DEFAULT '',
-    "updatedAt" TEXT NOT NULL DEFAULT ''
+    status client_status DEFAULT 'Lead',
+    revenue_gate TEXT,
+    tier TEXT,
+    ltv NUMERIC DEFAULT 0,
+    contract_value NUMERIC DEFAULT 0,
+    phone TEXT,
+    email TEXT,
+    contact_name TEXT,
+    niche TEXT,
+    start_date DATE,
+    shadow_avatar TEXT,
+    bleeding_neck TEXT,
+    content_pillars TEXT[], -- Array of strings
+    relationship_health relationship_health DEFAULT 'healthy',
+    onboarding_status onboarding_status DEFAULT 'not-started',
+    notes TEXT,
+    timeline JSONB[] DEFAULT '{}', -- Array of JSON objects for TimelineEvents
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())
 );
 
-ALTER TABLE clients ENABLE ROW LEVEL SECURITY;
-
--- Public access policy (adjust for your auth needs)
-CREATE POLICY "Allow full access to clients" ON clients
-    FOR ALL USING (true) WITH CHECK (true);
-
-
--- =====================================================
--- 2. TASKS TABLE
--- =====================================================
-CREATE TABLE IF NOT EXISTS tasks (
-    id BIGSERIAL PRIMARY KEY,
-    "clientId" BIGINT NOT NULL REFERENCES clients(id) ON DELETE CASCADE,
+-- Tasks Table
+CREATE TABLE tasks (
+    id SERIAL PRIMARY KEY,
+    client_id INTEGER REFERENCES clients(id) ON DELETE CASCADE,
     name TEXT NOT NULL,
-    category TEXT NOT NULL DEFAULT 'Other'
-        CHECK (category IN ('Content Production', 'Ad Creative', 'Website', 'Strategy',
-            'Video Production', 'Brand Design', 'Analytics', 'Automation',
-            'Client Communication', 'Other')),
-    phase TEXT NOT NULL DEFAULT 'phase1'
-        CHECK (phase IN ('phase1', 'phase2', 'phase3', 'ongoing')),
-    "stagePipeline" JSONB NOT NULL DEFAULT '["BRIEFED","IN PRODUCTION","REVIEW","CEO APPROVAL","CLIENT APPROVAL","DEPLOYED"]'::jsonb,
-    "currentStage" TEXT NOT NULL DEFAULT 'BRIEFED'
-        CHECK ("currentStage" IN ('BRIEFED', 'IN PRODUCTION', 'REVIEW', 'CEO APPROVAL', 'CLIENT APPROVAL', 'DEPLOYED')),
-    "assignedNode" TEXT NOT NULL DEFAULT 'CEO'
-        CHECK ("assignedNode" IN ('CEO', 'Art Director', 'Video Editor', 'Operations Builder',
-            'Social Media Manager', 'Documentation Manager')),
-    priority TEXT NOT NULL DEFAULT 'normal'
-        CHECK (priority IN ('critical', 'high', 'normal')),
-    status TEXT NOT NULL DEFAULT 'active'
-        CHECK (status IN ('active', 'deployed', 'cancelled')),
-    deadline TEXT NOT NULL DEFAULT '',
-    "estimatedHours" NUMERIC,
-    brief TEXT NOT NULL DEFAULT '',
-    "assetLinks" JSONB NOT NULL DEFAULT '[]'::jsonb,
-    "sopReference" TEXT,
-    "activityLog" JSONB NOT NULL DEFAULT '[]'::jsonb,
-    notes TEXT NOT NULL DEFAULT '',
-    "deliveredOnTime" BOOLEAN,
-    "linkedPostId" BIGINT,
-    "createdAt" TEXT NOT NULL DEFAULT '',
-    "updatedAt" TEXT NOT NULL DEFAULT ''
+    category task_category NOT NULL,
+    phase TEXT,
+    stage_pipeline task_stage[] DEFAULT '{}',
+    current_stage task_stage,
+    assigned_node node_role,
+    priority priority_level DEFAULT 'normal',
+    status task_status DEFAULT 'active',
+    deadline DATE,
+    estimated_hours NUMERIC,
+    brief TEXT,
+    asset_links TEXT[] DEFAULT '{}',
+    sop_reference TEXT,
+    activity_log JSONB[] DEFAULT '{}',
+    notes TEXT,
+    delivered_on_time BOOLEAN,
+    linked_post_id INTEGER, -- FK added later
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())
 );
 
-ALTER TABLE tasks ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Allow full access to tasks" ON tasks
-    FOR ALL USING (true) WITH CHECK (true);
-
-
--- =====================================================
--- 3. POSTS TABLE
--- =====================================================
-CREATE TABLE IF NOT EXISTS posts (
-    id BIGSERIAL PRIMARY KEY,
-    "clientId" BIGINT NOT NULL REFERENCES clients(id) ON DELETE CASCADE,
-    platforms JSONB NOT NULL DEFAULT '[]'::jsonb,
-    "postType" TEXT NOT NULL DEFAULT 'Static Post'
-        CHECK ("postType" IN ('Reel / Short Video', 'Static Post', 'Carousel', 'Story', 'Text Post', 'Event Post')),
-    "contentPillar" TEXT NOT NULL DEFAULT '',
-    "templateType" TEXT,
-    hook TEXT NOT NULL DEFAULT '',
-    "triggerUsed" TEXT,
-    "captionBody" TEXT NOT NULL DEFAULT '',
-    cta TEXT NOT NULL DEFAULT '',
-    "ctaType" TEXT NOT NULL DEFAULT 'Comment'
-        CHECK ("ctaType" IN ('Comment', 'Link in bio', 'DM for', 'Save this', 'Share this', 'Custom')),
-    hashtags TEXT NOT NULL DEFAULT '',
-    "visualBrief" TEXT NOT NULL DEFAULT '',
-    "scheduledDate" TEXT NOT NULL DEFAULT '',
-    "scheduledTime" TEXT NOT NULL DEFAULT '',
-    "publishedDate" TEXT,
-    status TEXT NOT NULL DEFAULT 'PLANNED'
-        CHECK (status IN ('PLANNED', 'BRIEF WRITTEN', 'IN PRODUCTION', 'REVIEW',
-            'CEO APPROVAL', 'CLIENT APPROVAL', 'SCHEDULED', 'PUBLISHED')),
-    priority TEXT NOT NULL DEFAULT 'normal'
-        CHECK (priority IN ('normal', 'high', 'urgent')),
-    "assignedTo" TEXT NOT NULL DEFAULT 'Art Director',
-    "linkedTaskId" BIGINT,
-    "assetLinks" JSONB NOT NULL DEFAULT '[]'::jsonb,
-    "referencePost" TEXT,
-    performance JSONB,
-    "activityLog" JSONB NOT NULL DEFAULT '[]'::jsonb,
-    "createdAt" TEXT NOT NULL DEFAULT '',
-    "updatedAt" TEXT NOT NULL DEFAULT ''
+-- Posts Table
+CREATE TABLE posts (
+    id SERIAL PRIMARY KEY,
+    client_id INTEGER REFERENCES clients(id) ON DELETE CASCADE,
+    platforms social_platform[] DEFAULT '{}',
+    post_type TEXT,
+    content_pillar TEXT,
+    template_type TEXT,
+    hook TEXT,
+    trigger_used TEXT,
+    caption_body TEXT,
+    cta TEXT,
+    cta_type TEXT,
+    hashtags TEXT,
+    visual_brief TEXT,
+    scheduled_date DATE,
+    scheduled_time TIME,
+    published_date DATE,
+    status post_stage DEFAULT 'PLANNED',
+    priority priority_level DEFAULT 'normal',
+    assigned_to node_role,
+    linked_task_id INTEGER REFERENCES tasks(id) ON DELETE SET NULL,
+    linked_prompt_id INTEGER,
+    asset_links TEXT[] DEFAULT '{}',
+    reference_post TEXT,
+    performance JSONB, -- For PerformanceLog object
+    activity_log JSONB[] DEFAULT '{}',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())
 );
 
-ALTER TABLE posts ENABLE ROW LEVEL SECURITY;
+-- Add circular FK for task to post (if needed by design)
+ALTER TABLE tasks ADD CONSTRAINT fk_tasks_post FOREIGN KEY (linked_post_id) REFERENCES posts(id) ON DELETE SET NULL;
 
-CREATE POLICY "Allow full access to posts" ON posts
-    FOR ALL USING (true) WITH CHECK (true);
-
-
--- =====================================================
--- 4. PROTOCOLS TABLE (Knowledge Vault)
--- =====================================================
-CREATE TABLE IF NOT EXISTS protocols (
-    id BIGSERIAL PRIMARY KEY,
+-- Protocols Table (Knowledge Vault)
+CREATE TABLE protocols (
+    id SERIAL PRIMARY KEY,
     title TEXT NOT NULL,
-    category TEXT NOT NULL DEFAULT 'sop'
-        CHECK (category IN ('sop', 'ai-prompt', 'client-knowledge-base', 'brand-standard')),
-    pillar TEXT NOT NULL DEFAULT 'Operations'
-        CHECK (pillar IN ('Market Truth', 'Psychological Warfare', 'Conversion Mechanic',
-            'Viral Engine', 'Growth Math', 'Operations', 'Client Management')),
-    tags JSONB NOT NULL DEFAULT '[]'::jsonb,
-    status TEXT NOT NULL DEFAULT 'active'
-        CHECK (status IN ('active', 'draft', 'archived')),
-    content TEXT NOT NULL DEFAULT '',
-    "promptTool" TEXT
-        CHECK ("promptTool" IN ('gemini', 'claude', 'both', NULL)),
-    "promptVariables" JSONB NOT NULL DEFAULT '[]'::jsonb,
-    "usageNotes" TEXT,
-    "exampleOutput" TEXT,
-    "linkedTaskTypes" JSONB NOT NULL DEFAULT '[]'::jsonb,
-    "linkedClientId" BIGINT,
-    "relatedProtocolIds" JSONB NOT NULL DEFAULT '[]'::jsonb,
-    "externalReferences" JSONB NOT NULL DEFAULT '[]'::jsonb,
-    "createdAt" TEXT NOT NULL DEFAULT '',
-    "updatedAt" TEXT NOT NULL DEFAULT '',
-    "copyCount" INTEGER NOT NULL DEFAULT 0
+    category protocol_category NOT NULL,
+    pillar TEXT,
+    tags TEXT[] DEFAULT '{}',
+    status protocol_status DEFAULT 'active',
+    content TEXT NOT NULL,
+    prompt_tool TEXT,
+    prompt_variables TEXT[] DEFAULT '{}',
+    usage_notes TEXT,
+    example_output TEXT,
+    linked_task_types task_category[] DEFAULT '{}',
+    linked_client_id INTEGER REFERENCES clients(id) ON DELETE SET NULL,
+    related_protocol_ids INTEGER[] DEFAULT '{}',
+    external_references TEXT[] DEFAULT '{}',
+    copy_count INTEGER DEFAULT 0,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())
 );
 
+-- Onboarding Protocols Table
+CREATE TABLE onboarding_protocols (
+    id TEXT PRIMARY KEY, -- Using UUID strings based on current design
+    client_id INTEGER REFERENCES clients(id) ON DELETE CASCADE,
+    steps JSONB[] NOT NULL DEFAULT '{}', -- Array of OnboardingStep objects
+    progress NUMERIC DEFAULT 0,
+    status TEXT DEFAULT 'on-track',
+    last_updated TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())
+);
+
+-- Row Level Security (Simple enable for now, can be restricted later)
+ALTER TABLE clients ENABLE ROW LEVEL SECURITY;
+ALTER TABLE tasks ENABLE ROW LEVEL SECURITY;
+ALTER TABLE posts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE protocols ENABLE ROW LEVEL SECURITY;
+ALTER TABLE onboarding_protocols ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Allow full access to protocols" ON protocols
-    FOR ALL USING (true) WITH CHECK (true);
-
-
--- =====================================================
--- 5. ONBOARDINGS TABLE
--- =====================================================
-CREATE TABLE IF NOT EXISTS onboardings (
-    id TEXT PRIMARY KEY,
-    "clientId" BIGINT NOT NULL REFERENCES clients(id) ON DELETE CASCADE,
-    steps JSONB NOT NULL DEFAULT '[]'::jsonb,
-    progress NUMERIC NOT NULL DEFAULT 0,
-    status TEXT NOT NULL DEFAULT 'on-track'
-        CHECK (status IN ('on-track', 'blocked', 'completed')),
-    "lastUpdated" TEXT NOT NULL DEFAULT ''
-);
-
-ALTER TABLE onboardings ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Allow full access to onboardings" ON onboardings
-    FOR ALL USING (true) WITH CHECK (true);
-
-
--- =====================================================
--- 6. INDEXES for performance
--- =====================================================
-CREATE INDEX IF NOT EXISTS idx_tasks_client_id ON tasks("clientId");
-CREATE INDEX IF NOT EXISTS idx_posts_client_id ON posts("clientId");
-CREATE INDEX IF NOT EXISTS idx_onboardings_client_id ON onboardings("clientId");
-CREATE INDEX IF NOT EXISTS idx_protocols_category ON protocols(category);
-CREATE INDEX IF NOT EXISTS idx_protocols_pillar ON protocols(pillar);
-CREATE INDEX IF NOT EXISTS idx_clients_status ON clients(status);
-CREATE INDEX IF NOT EXISTS idx_tasks_status ON tasks(status);
-CREATE INDEX IF NOT EXISTS idx_posts_status ON posts(status);
-
--- =====================================================
--- DONE! All tables created successfully.
--- =====================================================
+CREATE POLICY "Allow all actions for authenticated users" ON clients FOR ALL TO authenticated USING (true);
+CREATE POLICY "Allow all actions for authenticated users" ON tasks FOR ALL TO authenticated USING (true);
+CREATE POLICY "Allow all actions for authenticated users" ON posts FOR ALL TO authenticated USING (true);
+CREATE POLICY "Allow all actions for authenticated users" ON protocols FOR ALL TO authenticated USING (true);
+CREATE POLICY "Allow all actions for authenticated users" ON onboarding_protocols FOR ALL TO authenticated USING (true);
