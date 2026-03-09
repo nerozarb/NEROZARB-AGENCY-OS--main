@@ -47,6 +47,23 @@ export const generateOnboardingProtocol = (clientId: number): OnboardingProtocol
     };
 };
 
+export interface ProjectPhase {
+    id: number;
+    clientId: number;
+    title: string;
+    status: 'pending' | 'in_progress' | 'completed';
+    orderIndex: number;
+    createdAt?: string;
+    updatedAt?: string;
+}
+
+export interface ClientUpdate {
+    id: number;
+    clientId: number;
+    message: string;
+    createdAt?: string;
+}
+
 export interface Client {
     id: number;
     name: string;
@@ -67,6 +84,9 @@ export interface Client {
     onboardingStatus: 'not-started' | 'in-progress' | 'complete';
     notes: string;
     timeline: TimelineEvent[];
+    magicLinkToken?: string | null;
+    projectPhases?: ProjectPhase[];
+    clientUpdates?: ClientUpdate[];
     createdAt: string;
     updatedAt: string;
 }

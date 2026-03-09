@@ -6,6 +6,7 @@ import { ArrowLeft, Users, Zap, CheckCircle2, Circle, Activity, Palette, BookOpe
 import { useAppData } from '../../contexts/AppDataContext';
 import React, { useState, useMemo, memo } from 'react';
 import ClientEditModal from './ClientEditModal';
+import ClientPortalManager from './ClientPortalManager';
 
 export default function ClientDetailView({ clientId, onBack, onNavigate }: { clientId: string, onBack: () => void, onNavigate?: (view: string, clientId?: string) => void }) {
   const { data, updateOnboardingStep } = useAppData();
@@ -162,6 +163,11 @@ export default function ClientDetailView({ clientId, onBack, onNavigate }: { cli
             </section>
           </div>
 
+          {/* Client Portal Access & Management */}
+          <section className="pt-6 border-t border-border-dark/50">
+            <ClientPortalManager clientId={client.id} />
+          </section>
+
           {/* Strategic Assets Block */}
           <section className="space-y-6 pt-6 border-t border-border-dark/50">
             <div className="grid grid-cols-2 gap-10">
@@ -240,7 +246,7 @@ export default function ClientDetailView({ clientId, onBack, onNavigate }: { cli
           <section className="space-y-4">
             <div className="flex justify-between items-baseline">
               <h3 className="font-heading text-sm font-black tracking-tight uppercase">Health Index</h3>
-              <span className={`font-mono text-3xl font-black tracking-tighter ${healthStatus === 'healthy' ? 'text-primary' : healthStatus === 'at-risk' ? 'text-yellow-500' : 'text-red-500'}`}>
+              <span className={`font-mono text-3xl font-black tracking-tighter ${healthStatus === 'EXCELLENT' ? 'text-primary' : healthStatus === 'NEEDS ATTENTION' ? 'text-yellow-500' : 'text-red-500'}`}>
                 {healthScore}%
               </span>
             </div>
@@ -248,11 +254,11 @@ export default function ClientDetailView({ clientId, onBack, onNavigate }: { cli
               <motion.div
                 initial={{ width: 0 }}
                 animate={{ width: `${healthScore}%` }}
-                className={`h-full ${healthStatus === 'healthy' ? 'bg-primary shadow-[0_0_10px_rgba(63,106,36,0.5)]' : healthStatus === 'at-risk' ? 'bg-yellow-500 shadow-[0_0_10px_rgba(234,179,8,0.5)]' : 'bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]'}`}
+                className={`h-full ${healthStatus === 'EXCELLENT' ? 'bg-primary shadow-[0_0_10px_rgba(63,106,36,0.5)]' : healthStatus === 'NEEDS ATTENTION' ? 'bg-yellow-500 shadow-[0_0_10px_rgba(234,179,8,0.5)]' : 'bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]'}`}
               />
             </div>
             <p className="font-mono text-[10px] text-text-muted tracking-wide text-right uppercase">
-              {healthStatus === 'healthy' ? 'Optimal Performance' : healthStatus === 'at-risk' ? 'Attention Required' : 'Critical Intervention Needed'}
+              {healthStatus === 'EXCELLENT' ? 'Optimal Performance' : healthStatus === 'NEEDS ATTENTION' ? 'Attention Required' : 'Critical Intervention Needed'}
             </p>
           </section>
 

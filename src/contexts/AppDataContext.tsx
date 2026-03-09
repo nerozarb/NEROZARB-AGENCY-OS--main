@@ -31,6 +31,10 @@ interface AppDataContextType {
     recordPromptUsage: (id: number) => void;
     showToast: (message: string, type?: 'success' | 'error' | 'info') => void;
     toasts: Toast[];
+    generateMagicLink: (clientId: number) => void;
+    addProjectPhase: (clientId: number, title: string) => void;
+    updateProjectPhase: (clientId: number, phaseId: number, status: 'pending' | 'in_progress' | 'completed') => void;
+    addClientUpdate: (clientId: number, message: string) => void;
 }
 
 const AppDataContext = createContext<AppDataContextType | undefined>(undefined);
@@ -620,12 +624,108 @@ export function AppDataProvider({
         });
     };
 
+    const generateMagicLink = (clientId: number) => {
+        setData(prev => {
+            const nextClients = [...prev.clients];
+            const clientIndex = nextClients.findIndex(c => c.id === clientId);
+            if (clientIndex === -1) return prev;
+
+            // simple UUID generation for the browser
+            const token = crypto.randomUUID();
+
+            const updatedClient = {
+                ...nextClients[clientIndex],
+                magicLinkToken: token,
+                updatedAt: new Date().toISOString()
+            };
+            nextClients[clientIndex] = updatedClient;
+            sync.syncClientToSupabase(updatedClient);
+            return { ...prev, clients: nextClients };
+        });
+    };
+
+    const addProjectPhase = (clientId: number, title: string) => {
+        setData(prev => {
+            const nextClients = [...prev.clients];
+            const clientIndex = nextClients.findIndex(c => c.id === clientId);
+            if (clientIndex === -1) return prev;
+
+            const client = nextClients[clientIndex];
+            const phases = client.projectPhases || [];
+            const newPhase = {
+                id: Date.now(), // Local dev ID
+                clientId,
+                title,
+                status: 'pending' as const,
+                orderIndex: phases.length,
+                createdAt: new Date().toISOString()
+            };
+
+            const updatedClient = {
+                ...client,
+                projectPhases: [...phases, newPhase]
+            };
+            nextClients[clientIndex] = updatedClient;
+            sync.syncClientToSupabase(updatedClient);
+            return { ...prev, clients: nextClients };
+        });
+    };
+
+    const updateProjectPhase = (clientId: number, phaseId: number, status: 'pending' | 'in_progress' | 'completed') => {
+        setData(prev => {
+            const nextClients = [...prev.clients];
+            const clientIndex = nextClients.findIndex(c => c.id === clientId);
+            if (clientIndex === -1) return prev;
+
+            const client = nextClients[clientIndex];
+            if (!client.projectPhases) return prev;
+
+            const updatedPhases = client.projectPhases.map(p =>
+                p.id === phaseId ? { ...p, status, updatedAt: new Date().toISOString() } : p
+            );
+
+            const updatedClient = {
+                ...client,
+                projectPhases: updatedPhases
+            };
+            nextClients[clientIndex] = updatedClient;
+            sync.syncClientToSupabase(updatedClient);
+            return { ...prev, clients: nextClients };
+        });
+    };
+
+    const addClientUpdate = (clientId: number, message: string) => {
+        setData(prev => {
+            const nextClients = [...prev.clients];
+            const clientIndex = nextClients.findIndex(c => c.id === clientId);
+            if (clientIndex === -1) return prev;
+
+            const client = nextClients[clientIndex];
+            const updates = client.clientUpdates || [];
+            const newUpdate = {
+                id: Date.now(),
+                clientId,
+                message,
+                createdAt: new Date().toISOString()
+            };
+
+            const updatedClient = {
+                ...client,
+                clientUpdates: [newUpdate, ...updates] // newer first locally
+            };
+            nextClients[clientIndex] = updatedClient;
+            sync.syncClientToSupabase(updatedClient);
+            return { ...prev, clients: nextClients };
+        });
+    };
+
     // Memoize context value — prevents creating a new object reference on every render
     const contextValue = useMemo(() => ({
         data, setData, updateData, addClient, updateClient, deleteClient, addTimelineEvent,
         updateOnboardingStep, addTask, updateTask, advanceTaskStage, generateSprintTasks,
         addPost, updatePost, advancePostStage, generateMonthlyPosts, addProtocol, updateProtocol,
-        deleteProtocol, recordPromptUsage, showToast, toasts
+        deleteProtocol, recordPromptUsage, showToast, toasts,
+        generateMagicLink, addProjectPhase, updateProjectPhase, addClientUpdate
     }), [data, setData, showToast, toasts]);
 
     return (

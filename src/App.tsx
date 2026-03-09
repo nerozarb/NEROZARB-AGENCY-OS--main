@@ -15,6 +15,7 @@ const FulfillmentOS = lazy(() => import('./views/FulfillmentOS'));
 const ContentOS = lazy(() => import('./views/ContentOS'));
 const KnowledgeVault = lazy(() => import('./views/KnowledgeVault'));
 const OnboardingOS = lazy(() => import('./views/OnboardingOS'));
+const ClientPortalView = lazy(() => import('./views/PortalOS/ClientPortalView'));
 
 // Suspense fallback for lazy-loaded views
 function ViewLoader() {
@@ -139,6 +140,16 @@ export default function App() {
       <div className="min-h-screen bg-[#09090B] flex items-center justify-center">
         <div className="text-white/50 text-sm font-space animate-pulse">Establishing secure connection...</div>
       </div>
+    );
+  }
+
+  // 0. Client Portal Interceptor
+  if (window.location.pathname.startsWith('/portal/')) {
+    const token = window.location.pathname.replace('/portal/', '');
+    return (
+      <Suspense fallback={<ViewLoader />}>
+        <ClientPortalView token={token} />
+      </Suspense>
     );
   }
 
