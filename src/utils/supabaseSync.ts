@@ -200,7 +200,7 @@ export const fetchAppDataFromSupabase = async (): Promise<Partial<AppData> | nul
             supabase.from('tasks').select('*'),
             supabase.from('posts').select('*'),
             supabase.from('protocols').select('*'),
-            supabase.from('onboardings').select('*'),
+            supabase.from('onboarding_protocols').select('*'),
             supabase.from('settings').select('*').eq('id', 'global').single()
         ]);
 
@@ -233,15 +233,31 @@ export const fetchAppDataFromSupabase = async (): Promise<Partial<AppData> | nul
 // SYNC HELPERS
 // ─────────────────────────────────────────────────────────────────────────────
 
+// Utility to map camelCase object keys to snake_case for DB
+function toDB(obj: any) {
+    if (!obj || typeof obj !== 'object') return obj;
+    const result: any = {};
+    for (const key of Object.keys(obj)) {
+        const snakeKey = key.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
+        result[snakeKey] = obj[key];
+    }
+    return result;
+}
+
 export const syncClientToSupabase = async (client: Client, isNew: boolean = false) => {
     if (!isSupabaseConfigured()) return;
     debouncedSync(`client-${client.id}`, () => {
         withRetry(async () => {
+            // project_phases and client_updates are separate tables in Supabase.
+            // DO NOT sync them directly to the clients table schema.
+            const { projectPhases, clientUpdates, ...clientData } = client;
+            
+            const dbClient = toDB(clientData);
             if (isNew) {
-                const { error } = await supabase.from('clients').insert([client]);
+                const { error } = await supabase.from('clients').insert([dbClient]);
                 if (error) throw error;
             } else {
-                const { error } = await supabase.from('clients').update(client).eq('id', client.id);
+                const { error } = await supabase.from('clients').update(dbClient).eq('id', client.id);
                 if (error) throw error;
             }
         }, `sync client ${client.id}`);
@@ -261,11 +277,12 @@ export const syncTaskToSupabase = async (task: Task, isNew: boolean = false) => 
     if (!isSupabaseConfigured()) return;
     debouncedSync(`task-${task.id}`, () => {
         withRetry(async () => {
+            const dbTask = toDB(task);
             if (isNew) {
-                const { error } = await supabase.from('tasks').insert([task]);
+                const { error } = await supabase.from('tasks').insert([dbTask]);
                 if (error) throw error;
             } else {
-                const { error } = await supabase.from('tasks').update(task).eq('id', task.id);
+                const { error } = await supabase.from('tasks').update(dbTask).eq('id', task.id);
                 if (error) throw error;
             }
         }, `sync task ${task.id}`);
@@ -275,7 +292,7 @@ export const syncTaskToSupabase = async (task: Task, isNew: boolean = false) => 
 export const syncTasksToSupabase = async (tasks: Task[]) => {
     if (!isSupabaseConfigured() || tasks.length === 0) return;
     try {
-        await supabase.from('tasks').upsert(tasks);
+        await supabase.from('tasks').upsert(tasks.map(toDB));
     } catch (e) {
         console.error('Failed to bulk sync tasks to Supabase', e);
     }
@@ -285,11 +302,12 @@ export const syncPostToSupabase = async (post: Post, isNew: boolean = false) => 
     if (!isSupabaseConfigured()) return;
     debouncedSync(`post-${post.id}`, () => {
         withRetry(async () => {
+            const dbPost = toDB(post);
             if (isNew) {
-                const { error } = await supabase.from('posts').insert([post]);
+                const { error } = await supabase.from('posts').insert([dbPost]);
                 if (error) throw error;
             } else {
-                const { error } = await supabase.from('posts').update(post).eq('id', post.id);
+                const { error } = await supabase.from('posts').update(dbPost).eq('id', post.id);
                 if (error) throw error;
             }
         }, `sync post ${post.id}`);
@@ -299,7 +317,7 @@ export const syncPostToSupabase = async (post: Post, isNew: boolean = false) => 
 export const syncPostsToSupabase = async (posts: Post[]) => {
     if (!isSupabaseConfigured() || posts.length === 0) return;
     try {
-        await supabase.from('posts').upsert(posts);
+        await supabase.from('posts').upsert(posts.map(toDB));
     } catch (e) {
         console.error('Failed to bulk sync posts to Supabase', e);
     }
@@ -309,11 +327,12 @@ export const syncProtocolToSupabase = async (protocol: Protocol, isNew: boolean 
     if (!isSupabaseConfigured()) return;
     debouncedSync(`protocol-${protocol.id}`, () => {
         withRetry(async () => {
+            const dbProtocol = toDB(protocol);
             if (isNew) {
-                const { error } = await supabase.from('protocols').insert([protocol]);
+                const { error } = await supabase.from('protocols').insert([dbProtocol]);
                 if (error) throw error;
             } else {
-                const { error } = await supabase.from('protocols').update(protocol).eq('id', protocol.id);
+                const { error } = await supabase.from('protocols').update(dbProtocol).eq('id', protocol.id);
                 if (error) throw error;
             }
         }, `sync protocol ${protocol.id}`);
@@ -332,10 +351,13 @@ export const deleteProtocolFromSupabase = async (id: number) => {
 export const syncOnboardingToSupabase = async (onboarding: OnboardingProtocol, isNew: boolean = false) => {
     if (!isSupabaseConfigured()) return;
     try {
+        const dbOnboarding = toDB(onboarding);
+        // Supabase table is named 'onboarding_protocols' in schema but previously code used 'onboardings'
+        // Using 'onboarding_protocols' as defined in 001_initial_schema.sql
         if (isNew) {
-            await supabase.from('onboardings').insert([onboarding]);
+            await supabase.from('onboarding_protocols').insert([dbOnboarding]);
         } else {
-            await supabase.from('onboardings').update(onboarding).eq('id', onboarding.id);
+            await supabase.from('onboarding_protocols').update(dbOnboarding).eq('id', onboarding.id);
         }
     } catch (e) {
         console.error('Failed to sync onboarding to Supabase', e);

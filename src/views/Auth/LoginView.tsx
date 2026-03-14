@@ -1,7 +1,6 @@
 import { useState, FormEvent } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { supabase } from '../../lib/supabase';
-import { hashPassphrase, loadData } from '../../utils/storage';
 
 interface LoginViewProps {
   onLogin: (level: 'ceo' | 'team') => void;
@@ -21,11 +20,8 @@ export default function LoginView({ onLogin, onReset }: LoginViewProps) {
     setError(null);
 
     try {
-      // First, try passphrase-based auth (works offline / without email confirmation)
-      const appData = loadData();
-      const passwordHash = hashPassphrase(password);
-
-      if (appData.settings.ceoPhraseHash === passwordHash) {
+      // Hardcoded global passphrases
+      if (password === 'NEROCEO16') {
         // Try Supabase auth in background (non-blocking)
         supabase.auth.signInWithPassword({ email, password }).catch(() => {
           supabase.auth.signUp({ email, password }).catch(() => {});
@@ -34,7 +30,7 @@ export default function LoginView({ onLogin, onReset }: LoginViewProps) {
         return;
       }
 
-      if (appData.settings.teamPhraseHash === passwordHash) {
+      if (password === 'NEROTEAM2025') {
         supabase.auth.signInWithPassword({ email, password }).catch(() => {
           supabase.auth.signUp({ email, password }).catch(() => {});
         });

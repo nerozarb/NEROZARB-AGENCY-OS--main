@@ -1,6 +1,5 @@
 import { useState, useEffect, lazy, Suspense } from 'react';
 import LoginView from './views/Auth/LoginView';
-import SetupView from './views/Auth/SetupView';
 import AppShell from './components/layout/AppShell';
 import { loadData, saveData, AppData } from './utils/storage';
 import { AppDataProvider } from './contexts/AppDataContext';
@@ -156,13 +155,7 @@ export default function App() {
   }
 
   // 1. Initial Setup Mode
-  if (!data.settings.initialized) {
-    return (
-      <AppDataProvider data={data} setData={setData}>
-        <SetupView onInitialize={handleInitialize} />
-      </AppDataProvider>
-    );
-  }
+  // Setup view removed because we are using hardcoded global passphrases.
 
   // 2. Login Screen
   if (!authLevel) {
