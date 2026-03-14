@@ -1,7 +1,7 @@
-const express = require('express');
-const cors = require('cors');
-const multer = require('multer');
-const dotenv = require('dotenv');
+import express from 'express';
+import cors from 'cors';
+import multer from 'multer';
+import dotenv from 'dotenv';
 
 dotenv.config();
 

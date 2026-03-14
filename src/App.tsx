@@ -42,14 +42,16 @@ export default function App() {
       // 1. Check Supabase Session First
       const { data: { session } } = await supabase.auth.getSession();
 
+      const storedAuthLevel = sessionStorage.getItem('authLevel') as 'ceo' | 'team' | null;
+
       if (session) {
-        // Auto-login based on session existence. In a real app we'd check claims.
-        // For now we trust the stored authLevel in sessionStorage as a UX preference, 
-        // but the backend is secured via Supabase RLS.
-        setAuthLevel((sessionStorage.getItem('authLevel') as 'ceo' | 'team') || 'ceo');
+        // Auto-login based on session existence.
+        setAuthLevel(storedAuthLevel || 'ceo');
+      } else if (storedAuthLevel) {
+        // Passphrase-based auth: trust sessionStorage even without Supabase session
+        setAuthLevel(storedAuthLevel);
       } else {
         setAuthLevel(null);
-        sessionStorage.removeItem('authLevel');
       }
 
       // 2. Fetch App Data

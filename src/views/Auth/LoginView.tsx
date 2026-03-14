@@ -1,6 +1,7 @@
 import { useState, FormEvent } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { supabase } from '../../lib/supabase';
+import { hashPassphrase, loadData } from '../../utils/storage';
 
 interface LoginViewProps {
   onLogin: (level: 'ceo' | 'team') => void;
@@ -20,6 +21,28 @@ export default function LoginView({ onLogin, onReset }: LoginViewProps) {
     setError(null);
 
     try {
+      // First, try passphrase-based auth (works offline / without email confirmation)
+      const appData = loadData();
+      const passwordHash = hashPassphrase(password);
+
+      if (appData.settings.ceoPhraseHash === passwordHash) {
+        // Try Supabase auth in background (non-blocking)
+        supabase.auth.signInWithPassword({ email, password }).catch(() => {
+          supabase.auth.signUp({ email, password }).catch(() => {});
+        });
+        onLogin('ceo');
+        return;
+      }
+
+      if (appData.settings.teamPhraseHash === passwordHash) {
+        supabase.auth.signInWithPassword({ email, password }).catch(() => {
+          supabase.auth.signUp({ email, password }).catch(() => {});
+        });
+        onLogin('team');
+        return;
+      }
+
+      // If passphrase didn't match, fall back to Supabase auth
       let authResponse = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -34,19 +57,23 @@ export default function LoginView({ onLogin, onReset }: LoginViewProps) {
         });
 
         if (!authResponse.error && authResponse.data.user) {
-          setError('Instance created. Awaiting manual activation if email confirmation is enabled, otherwise logging in...');
+          if (authResponse.data.user.identities?.length === 0) {
+            setError('Email confirmation required. Check your inbox.');
+            return;
+          }
+          setError('Instance created. Logging in...');
         }
       }
 
       if (authResponse.error) throw authResponse.error;
 
       if (authResponse.data.user) {
-        onLogin('ceo'); // Could be mapped based on user metadata later
+        onLogin('ceo');
       }
 
     } catch (err: any) {
-      setError(err.message || 'Authentication failed');
-      setTimeout(() => setError(null), 3000);
+      setError(err.message || 'Authentication failed. Use your CEO or Team passphrase as the password.');
+      setTimeout(() => setError(null), 5000);
     } finally {
       setIsLoading(false);
     }
