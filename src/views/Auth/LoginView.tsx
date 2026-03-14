@@ -1,15 +1,16 @@
 import { useState, FormEvent } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { supabase } from '../../lib/supabase';
 
 interface LoginViewProps {
   onLogin: (level: 'ceo' | 'team') => void;
   onReset: () => void;
 }
 
+const CEO_PASSPHRASE = 'NEROCEO16';
+const TEAM_PASSPHRASE = 'NEROTEAM2025';
+
 export default function LoginView({ onLogin, onReset }: LoginViewProps) {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [passphrase, setPassphrase] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [resetClicks, setResetClicks] = useState(0);
@@ -19,60 +20,21 @@ export default function LoginView({ onLogin, onReset }: LoginViewProps) {
     setIsLoading(true);
     setError(null);
 
-    try {
-      // Hardcoded global passphrases
-      if (password === 'NEROCEO16') {
-        // Try Supabase auth in background (non-blocking)
-        supabase.auth.signInWithPassword({ email, password }).catch(() => {
-          supabase.auth.signUp({ email, password }).catch(() => {});
-        });
-        onLogin('ceo');
-        return;
-      }
+    const trimmed = passphrase.trim().toUpperCase();
 
-      if (password === 'NEROTEAM2025') {
-        supabase.auth.signInWithPassword({ email, password }).catch(() => {
-          supabase.auth.signUp({ email, password }).catch(() => {});
-        });
-        onLogin('team');
-        return;
-      }
-
-      // If passphrase didn't match, fall back to Supabase auth
-      let authResponse = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      // If invalid credentials, attempt to sign up automatically
-      if (authResponse.error && authResponse.error.message === 'Invalid login credentials') {
-        setError('Account not found, creating new secure instance...');
-        authResponse = await supabase.auth.signUp({
-          email,
-          password
-        });
-
-        if (!authResponse.error && authResponse.data.user) {
-          if (authResponse.data.user.identities?.length === 0) {
-            setError('Email confirmation required. Check your inbox.');
-            return;
-          }
-          setError('Instance created. Logging in...');
-        }
-      }
-
-      if (authResponse.error) throw authResponse.error;
-
-      if (authResponse.data.user) {
-        onLogin('ceo');
-      }
-
-    } catch (err: any) {
-      setError(err.message || 'Authentication failed. Use your CEO or Team passphrase as the password.');
-      setTimeout(() => setError(null), 5000);
-    } finally {
-      setIsLoading(false);
+    if (trimmed === CEO_PASSPHRASE) {
+      onLogin('ceo');
+      return;
     }
+
+    if (trimmed === TEAM_PASSPHRASE) {
+      onLogin('team');
+      return;
+    }
+
+    setError('Invalid passphrase. Access denied.');
+    setIsLoading(false);
+    setTimeout(() => setError(null), 4000);
   };
 
   return (
@@ -94,25 +56,7 @@ export default function LoginView({ onLogin, onReset }: LoginViewProps) {
 
         <form onSubmit={handleSubmit} className="w-full max-w-xs relative flex flex-col items-center space-y-4">
           <motion.div
-            animate={error && !error.includes('creating') ? {
-              x: [0, -10, 10, -10, 10, 0],
-              transition: { duration: 0.4 }
-            } : {}}
-            className="relative w-full"
-          >
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="EMAIL ADDRESS"
-              className={`w-full bg-transparent border-b ${error && !error.includes('creating') ? 'border-red-500' : 'border-border-dark'} py-4 text-center font-mono text-sm tracking-[0.2em] text-text-primary placeholder:text-text-muted/30 focus:outline-none focus:border-primary transition-colors`}
-              required
-              autoFocus
-            />
-          </motion.div>
-
-          <motion.div
-            animate={error && !error.includes('creating') ? {
+            animate={error ? {
               x: [0, -10, 10, -10, 10, 0],
               transition: { duration: 0.4 }
             } : {}}
@@ -120,17 +64,18 @@ export default function LoginView({ onLogin, onReset }: LoginViewProps) {
           >
             <input
               type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="PASSWORD"
-              className={`w-full bg-transparent border-b ${error && !error.includes('creating') ? 'border-red-500' : 'border-border-dark'} py-4 text-center font-mono text-sm tracking-[0.2em] text-text-primary placeholder:text-text-muted/30 focus:outline-none focus:border-primary transition-colors`}
-              required
+              value={passphrase}
+              onChange={(e) => setPassphrase(e.target.value)}
+              placeholder="ENTER PASSPHRASE"
+              className={`w-full bg-transparent border-b ${error ? 'border-red-500' : 'border-border-dark'} py-4 text-center font-mono text-sm tracking-[0.2em] text-text-primary placeholder:text-text-muted/30 focus:outline-none focus:border-primary transition-colors`}
+              autoFocus
+              autoComplete="off"
             />
           </motion.div>
 
           <button
             type="submit"
-            disabled={isLoading}
+            disabled={isLoading || !passphrase.trim()}
             className="mt-8 w-full bg-primary hover:bg-accent-mid disabled:opacity-50 text-text-primary font-mono text-xs py-3 tracking-[0.2em] transition-colors uppercase disabled:cursor-not-allowed"
           >
             {isLoading ? 'AUTHENTICATING...' : 'ACCESS SYSTEM'}
@@ -142,7 +87,7 @@ export default function LoginView({ onLogin, onReset }: LoginViewProps) {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0 }}
-                className={`absolute -bottom-10 left-0 right-0 text-center font-mono text-[10px] tracking-widest uppercase line-clamp-2 ${error.includes('creating') || error.includes('created') ? 'text-primary' : 'text-red-500'}`}
+                className="absolute -bottom-10 left-0 right-0 text-center font-mono text-[10px] tracking-widest uppercase text-red-500"
               >
                 [ {error} ]
               </motion.p>
@@ -165,4 +110,3 @@ export default function LoginView({ onLogin, onReset }: LoginViewProps) {
     </div>
   );
 }
-
