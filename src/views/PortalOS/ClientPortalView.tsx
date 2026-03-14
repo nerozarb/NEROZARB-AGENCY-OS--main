@@ -1,7 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
+import { loadData, Client, ProjectPhase, ClientUpdate } from '../../utils/storage';
 import { supabase } from '../../lib/supabase';
-import { Client, ProjectPhase, ClientUpdate } from '../../utils/storage';
 import { CheckCircle2, Circle, Clock, MessageSquare, Layout } from 'lucide-react';
+
+// Check if Supabase is actually configured (not placeholder)
+const isSupabaseConfigured = () => {
+    const url = import.meta.env.VITE_SUPABASE_URL;
+    const key = import.meta.env.VITE_SUPABASE_ANON_KEY;
+    return Boolean(url && key && url !== 'https://placeholder-project.supabase.co');
+};
 
 export default function ClientPortalView({ token }: { token: string }) {
     const [client, setClient] = useState<Partial<Client> | null>(null);
@@ -14,44 +21,73 @@ export default function ClientPortalView({ token }: { token: string }) {
         async function loadPortalData() {
             try {
                 setLoading(true);
-                // 1. Fetch Client Identity
-                const { data: clientData, error: clientErr } = await supabase
-                    .from('clients')
-                    .select('id, name, company, logo_url')
-                    .eq('magic_link_token', token)
-                    .single();
 
-                if (clientErr || !clientData) throw new Error('Invalid or expired magic link.');
+                // --- Strategy 1: Try localStorage first (always available) ---
+                const localData = loadData();
+                const localClient = localData.clients.find(c => c.magicLinkToken === token);
 
-                setClient(clientData as Partial<Client>);
+                if (localClient) {
+                    setClient(localClient);
+                    setPhases(localClient.projectPhases || []);
+                    setUpdates(localClient.clientUpdates || []);
+                    setLoading(false);
+                    return; // Found locally, done!
+                }
 
-                // 2. Fetch Project Phases
-                const { data: phasesData } = await supabase
-                    .from('project_phases')
-                    .select('*')
-                    .eq('client_id', clientData.id)
-                    .order('order_index', { ascending: true });
+                // --- Strategy 2: Fall back to Supabase if configured ---
+                if (isSupabaseConfigured()) {
+                    const { data: clientData, error: clientErr } = await supabase
+                        .from('clients')
+                        .select('*')
+                        .eq('magic_link_token', token)
+                        .single();
 
-                if (phasesData) setPhases(phasesData.map(p => ({
-                    ...p,
-                    clientId: p.client_id,
-                    orderIndex: p.order_index,
-                    createdAt: p.created_at,
-                    updatedAt: p.updated_at
-                })) as ProjectPhase[]);
+                    if (clientErr || !clientData) {
+                        throw new Error('Invalid or expired magic link.');
+                    }
 
-                // 3. Fetch Client Updates
-                const { data: updatesData } = await supabase
-                    .from('client_updates')
-                    .select('*')
-                    .eq('client_id', clientData.id)
-                    .order('created_at', { ascending: false });
+                    setClient({
+                        id: clientData.id,
+                        name: clientData.name,
+                        email: clientData.email,
+                        niche: clientData.niche,
+                        magicLinkToken: clientData.magic_link_token,
+                    } as Partial<Client>);
 
-                if (updatesData) setUpdates(updatesData.map(u => ({
-                    ...u,
-                    clientId: u.client_id,
-                    createdAt: u.created_at
-                })) as ClientUpdate[]);
+                    // Fetch project phases
+                    const { data: phasesData } = await supabase
+                        .from('project_phases')
+                        .select('*')
+                        .eq('client_id', clientData.id)
+                        .order('order_index', { ascending: true });
+
+                    if (phasesData) setPhases(phasesData.map(p => ({
+                        ...p,
+                        clientId: p.client_id,
+                        orderIndex: p.order_index,
+                        createdAt: p.created_at,
+                        updatedAt: p.updated_at
+                    })) as ProjectPhase[]);
+
+                    // Fetch client updates
+                    const { data: updatesData } = await supabase
+                        .from('client_updates')
+                        .select('*')
+                        .eq('client_id', clientData.id)
+                        .order('created_at', { ascending: false });
+
+                    if (updatesData) setUpdates(updatesData.map(u => ({
+                        ...u,
+                        clientId: u.client_id,
+                        createdAt: u.created_at
+                    })) as ClientUpdate[]);
+
+                    setLoading(false);
+                    return;
+                }
+
+                // Neither source found the token
+                throw new Error('Invalid or expired magic link.');
 
             } catch (err: any) {
                 setError(err.message || 'Failed to load portal');
@@ -78,7 +114,7 @@ export default function ClientPortalView({ token }: { token: string }) {
             <div className="min-h-screen bg-[#09090B] flex flex-col items-center justify-center p-6 text-center">
                 <Layout className="w-12 h-12 text-red-500 mb-4 opacity-50" />
                 <h1 className="text-xl text-text-primary font-heading font-black tracking-tight mb-2">Access Denied</h1>
-                <p className="text-text-secondary text-sm max-w-sm">{error || 'This magic link is invalid or has expired. Please contact your agency for a new link.'}</p>
+                <p className="text-text-secondary text-sm max-w-sm">{error || 'Invalid or expired magic link. Please contact your agency for a new link.'}</p>
             </div>
         );
     }
@@ -89,15 +125,11 @@ export default function ClientPortalView({ token }: { token: string }) {
             <header className="border-b border-border-dark bg-surface/30 backdrop-blur-md sticky top-0 z-10">
                 <div className="max-w-4xl mx-auto px-6 h-16 flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                        {client.logo_url ? (
-                            <img src={client.logo_url} alt="Logo" className="w-8 h-8 rounded-full object-cover border border-border-dark" />
-                        ) : (
-                            <div className="w-8 h-8 rounded-full bg-primary/20 text-primary flex items-center justify-center font-bold text-xs border border-primary/30">
-                                {client.name?.charAt(0) || client.company?.charAt(0)}
-                            </div>
-                        )}
+                        <div className="w-8 h-8 rounded-full bg-primary/20 text-primary flex items-center justify-center font-bold text-xs border border-primary/30">
+                            {client.name?.charAt(0) || '?'}
+                        </div>
                         <div>
-                            <h1 className="font-heading font-black text-sm tracking-tight">{client.company || client.name}</h1>
+                            <h1 className="font-heading font-black text-sm tracking-tight">{client.name}</h1>
                             <p className="text-[10px] text-text-muted font-mono uppercase tracking-widest">Client Portal</p>
                         </div>
                     </div>
@@ -166,7 +198,7 @@ export default function ClientPortalView({ token }: { token: string }) {
 
                     {updates.length === 0 ? (
                         <div className="p-6 border border-dashed border-border-dark rounded-sm text-center text-text-muted text-sm">
-                            No recent updates broadcasts.
+                            No recent update broadcasts.
                         </div>
                     ) : (
                         <div className="space-y-4">

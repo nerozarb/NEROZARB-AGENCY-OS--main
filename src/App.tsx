@@ -81,7 +81,7 @@ export default function App() {
 
   // Debounced save — prevents serializing entire state on every keystroke/click
   useEffect(() => {
-    if (!data.settings.initialized || isLoading) return;
+    if (isLoading) return;
     const timeout = setTimeout(() => saveData(data), 500);
     return () => clearTimeout(timeout);
   }, [data, isLoading]);
